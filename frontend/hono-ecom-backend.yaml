@@ -1,0 +1,246 @@
+openapi: 3.0.0
+info:
+  version: "2"
+  title: Hono Ecom Backend
+  description: E-commerce backend API with authentication and user management
+servers:
+  - url: /api/better-auth/open-api/generate-schema
+  - url: /api/doc
+components:
+  schemas: {}
+  parameters: {}
+paths:
+  /api:
+    get:
+      tags:
+        - Base
+      responses:
+        "200":
+          description: OK - Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: Operation completed successfully
+                  statusCode:
+                    type: number
+                    default: 200
+        "422":
+          description: Unprocessable Entity - Validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        default: Request validation failed
+                      issues:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                            path:
+                              type: string
+                            code:
+                              type: string
+                          required:
+                            - message
+                  statusCode:
+                    type: number
+                    default: 422
+                required:
+                  - error
+  /api/mailer/send:
+    post:
+      tags:
+        - Mailer
+      summary: Use Resend Mailers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                to:
+                  anyOf:
+                    - type: string
+                      format: email
+                    - type: array
+                      items:
+                        type: string
+                        format: email
+                      minItems: 1
+                  description: Recipient email address(es)
+                subject:
+                  type: string
+                  minLength: 1
+                  description: Email subject
+                html:
+                  type: string
+                  description: HTML content of the email
+                text:
+                  type: string
+                  description: Plain text content of the email
+                from:
+                  type: string
+                  format: email
+                  description: Sender email address
+                replyTo:
+                  type: string
+                  format: email
+                  description: Reply-to email address
+                cc:
+                  anyOf:
+                    - type: string
+                      format: email
+                    - type: array
+                      items:
+                        type: string
+                        format: email
+                  description: CC email address(es)
+                bcc:
+                  anyOf:
+                    - type: string
+                      format: email
+                    - type: array
+                      items:
+                        type: string
+                        format: email
+                  description: BCC email address(es)
+              required:
+                - to
+                - subject
+      responses:
+        "200":
+          description: OK - Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: Operation completed successfully
+                  statusCode:
+                    type: number
+                    default: 200
+        "400":
+          description: Bad Request - Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        default: Invalid request parameters provided
+                      issues:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                            path:
+                              type: string
+                            code:
+                              type: string
+                          required:
+                            - message
+                  statusCode:
+                    type: number
+                    default: 400
+                required:
+                  - error
+        "422":
+          description: Unprocessable Entity - Validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        default: Request validation failed
+                      issues:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                            path:
+                              type: string
+                            code:
+                              type: string
+                          required:
+                            - message
+                  statusCode:
+                    type: number
+                    default: 422
+                required:
+                  - error
+        "500":
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        default: An unexpected error occurred
+                      issues:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                            path:
+                              type: string
+                            code:
+                              type: string
+                          required:
+                            - message
+                  statusCode:
+                    type: number
+                    default: 500
+                required:
+                  - error

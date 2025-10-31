@@ -100,6 +100,7 @@ export const auth = betterAuth({
       overrideDefaultEmailVerification: true,
       sendVerificationOnSignUp: true,
     }),
+    openAPI({ disableDefaultReference: true }),
   ],
 
   // Debug logging
@@ -119,25 +120,11 @@ export const auth = betterAuth({
         }
       : {},
 
-  // Email verification configuration - use default better-auth behavior
-  // Better-auth uses JWT tokens for email verification by default
-
   // Session configuration
-  session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day
-  },
-
-  // User configuration with custom fields
-  user: {
-    additionalFields: {
-      role: {
-        type: "string",
-        defaultValue: Roles.DEFAULT,
-        returned: true,
-      },
-    },
-  },
+  // session: {
+  //   expiresIn: 60 * 60 * 24 * 7, // 7 days
+  //   updateAge: 60 * 60 * 24, // 1 day
+  // },
 
   // Advanced configuration
   advanced: {
@@ -160,5 +147,5 @@ export const auth = betterAuth({
     max: 100, // 100 requests per minute
   },
 
-  trustedOrigins: ["http://localhost:3000"],
+  // trustedOrigins: ["http://localhost:3000"],
 });

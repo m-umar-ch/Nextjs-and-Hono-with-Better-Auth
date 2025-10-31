@@ -1,34 +1,34 @@
 import { Scalar } from "@scalar/hono-api-reference";
 
-import packageJSON from "../../../package.json" with { type: "json" };
+// import packageJSON from "../../../package.json" with { type: "json" };
 import type { AppOpenAPI } from "./create-router";
 
 export default function configureOpenAPI(app: AppOpenAPI) {
   app.doc("/doc", {
     openapi: "3.0.0",
     info: {
-      version: packageJSON.version,
+      // version: packageJSON.version,
+      version: "2",
       title: "Hono Ecom Backend",
       description:
         "E-commerce backend API with authentication and user management",
     },
     servers: [
-      {
-        url: "/",
-        description: "API Base URL",
-      },
-    ],
-
-    security: [
-      {
-        bearerAuth: [],
-      },
+      { url: "/api/better-auth/open-api/generate-schema" },
+      // Better Auth schema generation endpoint
+      { url: "/api/doc" },
     ],
   });
 
   app.get(
     "/reference",
     Scalar({
+      // pageTitle: "API Documentation",
+      sources: [
+        { url: "/api/better-auth/open-api/generate-schema", title: "Auth" },
+        // Better Auth schema generation endpoint
+        { url: "/api/doc", title: "Api", default: true },
+      ],
       theme: "kepler",
       layout: "classic",
       defaultHttpClient: {
@@ -51,6 +51,10 @@ export default function configureOpenAPI(app: AppOpenAPI) {
       },
       defaultOpenAllTags: false,
       withDefaultFonts: true,
+      // sources: [
+      //   { url: "/api/doc", title: "Api", },
+      //   { url: "/api/better-auth/reference", title: "Auth" }
+      // ]
     })
   );
 }

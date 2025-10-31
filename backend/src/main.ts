@@ -20,11 +20,13 @@ import { APISchema } from "./lib/schemas/api-schemas";
 import { HONO_RESPONSE } from "./lib/utils";
 import { mailerController } from "./modules/mailer/controller/mailer.controller";
 import { auth } from "./modules/auth/service/auth";
-import { optionalAuthMiddleware } from "./lib/middlewares/auth.middleware";
+import { authMiddleware } from "./lib/middlewares/auth.middleware";
 import {
   Auth_CORS_Middleware,
   CORS_Middleware,
 } from "./lib/middlewares/cors.middleware";
+import { hc } from "hono/client";
+import { hcWithType } from "./client";
 
 const createApp = () => {
   const app = createRouter().basePath("/api");
@@ -39,7 +41,7 @@ const createApp = () => {
   // Sentry middleware for request tracking
   app.use("*", sentryMiddleware);
 
-  app.use("*", optionalAuthMiddleware);
+  app.use("*", authMiddleware);
 
   app.notFound(createNotFoundHandler());
   app.onError(sentryErrorHandler(onError));
@@ -53,11 +55,10 @@ configureOpenAPI(app);
 
 // Mount Better Auth handler
 app.on(["POST", "GET"], "/better-auth/*", (c) => {
-  console.log("====================================");
-  console.log(c.req.raw);
-  console.log("====================================");
   return auth.handler(c.req.raw);
 });
+
+app.get("/wallah", (c) => c.json({ helo: "kd" }));
 
 app.openapi(
   {
@@ -70,12 +71,6 @@ app.openapi(
     },
   },
   (c) => {
-    console.log("====================================");
-    console.log(JSON.stringify(c.get("user"), null, 2));
-    console.log("====================================");
-    console.log("====================================");
-    console.log(JSON.stringify(c.get("session"), null, 2));
-    console.log("====================================");
     return c.json(HONO_RESPONSE({ message: "Yollo Bozo" }), HTTP.OK);
   }
 );
@@ -97,6 +92,8 @@ HonoLogger(
   `📚 Scalar API documentation available at: http://localhost:${env.PORT}/api/reference`
 );
 
+export type AppType = (typeof controllers)[number];
+// export const client = hc<AppType>("http://localhost:8787/");
 /**
  * const requestId = c.get("requestId")
  */

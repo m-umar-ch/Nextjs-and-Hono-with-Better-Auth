@@ -3,6 +3,7 @@ import { moduleTags } from "../../module.tags";
 import { HTTP } from "@/lib/http/status-codes";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_RESPONSE, HONO_ERROR } from "@/lib/utils";
+import { AppRouteHandler } from "@/lib/core/create-router";
 
 /**
  * @info Zod schema for sendEmail API input validation
@@ -70,7 +71,7 @@ export const POST_Route = createRoute({
   },
 });
 
-export const POST_Handler: RouteHandler<typeof POST_Route> = async (c) => {
+export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
   try {
     const emailData = c.req.valid("json");
 

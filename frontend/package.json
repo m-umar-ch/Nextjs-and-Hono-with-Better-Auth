@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "openapi": "bunx openapi-typescript http://localhost:9999/api/doc -o ./src/DAL/api-types.d.ts"
+    "openapi": "bunx openapi-typescript http://localhost:9999/api/doc?api=auth -o ./src/DAL/api-types.d.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
