@@ -1,7 +1,15 @@
 import { GalleryVerticalEnd } from "lucide-react";
 import { LoginCard } from "./_components/login-card";
+import { authClient } from "@/auth/auth-client";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
+const page = async () => {
+  const { data } = await authClient.getSession({
+    fetchOptions: { headers: await headers() },
+  });
+  if (data && data.session && data.user) redirect("/");
+
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -12,8 +20,14 @@ export default function LoginPage() {
           Acme Inc.
         </a>
 
+        {/* <button onClick={() => toast.success("Something Went Wrong")}>
+          hello
+        </button> */}
+
         <LoginCard />
       </div>
     </div>
   );
-}
+};
+
+export default page;

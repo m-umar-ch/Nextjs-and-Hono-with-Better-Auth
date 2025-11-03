@@ -16,7 +16,8 @@ const EnvSchema = z.object({
   BETTER_AUTH_SECRET: z
     .string()
     .min(32, "Better Auth secret must be at least 32 characters"),
-  BETTER_AUTH_URL: z.url().default("http://localhost:9999"),
+  BACKEND_BASE_URL: z.url().default("http://localhost:9999"),
+  FRONTEND_BASE_URL: z.url().default("http://localhost:3000"),
 
   // Google OAuth Configuration
   GOOGLE_CLIENT_ID: z.string().optional(),

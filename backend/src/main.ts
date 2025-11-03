@@ -17,7 +17,7 @@ import { createNotFoundHandler } from "./lib/middlewares/not-found-middleware";
 import { faviconMiddleware } from "./lib/middlewares/favicon-middleware";
 import { HTTP } from "./lib/http/status-codes";
 import { APISchema } from "./lib/schemas/api-schemas";
-import { HONO_RESPONSE } from "./lib/utils";
+import { HONO_ERROR, HONO_RESPONSE } from "./lib/utils";
 import { mailerController } from "./modules/mailer/controller/mailer.controller";
 import { auth } from "./modules/auth/service/auth";
 import { authMiddleware } from "./lib/middlewares/auth.middleware";
@@ -32,6 +32,7 @@ const createApp = () => {
   // app.use("*", CORS_Middleware);
 
   app.use("/better-auth/*", Auth_CORS_Middleware);
+  app.use("*", Auth_CORS_Middleware);
 
   // Sentry middleware for request tracking
   app.use("*", sentryMiddleware);
@@ -60,10 +61,16 @@ app.openapi(
     tags: ["Base"],
     responses: {
       [HTTP.OK]: APISchema.OK,
+      [HTTP.UNAUTHORIZED]: APISchema.UNAUTHORIZED,
       [HTTP.UNPROCESSABLE_ENTITY]: APISchema.UNPROCESSABLE_ENTITY,
     },
+    middleware: [],
   },
   (c) => {
+    if (!c.var.session) {
+      return c.json(HONO_ERROR("UNAUTHORIZED"), HTTP.UNAUTHORIZED);
+    }
+
     return c.json(HONO_RESPONSE({ message: "Yollo Bozo" }), HTTP.OK);
   }
 );

@@ -15,6 +15,8 @@ export function FormInput(props: FormControlProps) {
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
         aria-invalid={isInvalid}
+        placeholder={props.placeHolder}
+        type={props.placeHolder}
       />
     </FormBase>
   );

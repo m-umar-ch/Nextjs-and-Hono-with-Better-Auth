@@ -13,7 +13,7 @@ import { adminClient, emailOTPClient } from "better-auth/client/plugins";
 
 // Create Better Auth client for client-side usage
 export const authClient = createAuthClient({
-  baseURL: env.BETTER_AUTH_URL,
+  baseURL: env.BACKEND_BASE_URL,
   plugins: [
     adminClient({
       ac,

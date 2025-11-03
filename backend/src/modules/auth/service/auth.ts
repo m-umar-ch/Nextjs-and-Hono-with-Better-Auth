@@ -3,8 +3,6 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import env from "@/env";
 import {
-  sendEmailVerificationEmail,
-  sendPasswordResetEmail,
   sendEmailVerificationOTP,
   sendPasswordResetOTP,
   sendSigninOTP,
@@ -16,7 +14,6 @@ import {
   openAPI,
   username,
 } from "better-auth/plugins";
-import { inferAdditionalFields } from "better-auth/client/plugins";
 import {
   ac,
   admin,
@@ -116,6 +113,8 @@ export const auth = betterAuth({
           google: {
             clientId: env.GOOGLE_CLIENT_ID,
             clientSecret: env.GOOGLE_CLIENT_SECRET,
+            prompt: "select_account",
+            // redirectURI: `${env.FRONTEND_BASE_URL}/api/better-auth/callback/google`,
           },
         }
       : {},
@@ -133,8 +132,8 @@ export const auth = betterAuth({
       sessionToken: {
         attributes: {
           sameSite: "none",
-          secure: true,
-          partitioned: true,
+          secure: false,
+          // partitioned: true,
           // httpOnly: true,
         },
       },
@@ -147,5 +146,8 @@ export const auth = betterAuth({
     max: 100, // 100 requests per minute
   },
 
-  // trustedOrigins: ["http://localhost:3000"],
+  trustedOrigins: [
+    "http://localhost:3000",
+    // "https://*.example.com"
+  ],
 });

@@ -11,6 +11,8 @@ import {
 export type FormControlProps = {
   label: string;
   description?: string;
+  placeHolder?: string;
+  type?: React.HTMLInputTypeAttribute;
 };
 
 type FormBaseProps = FormControlProps & {
