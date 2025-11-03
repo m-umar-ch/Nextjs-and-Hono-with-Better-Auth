@@ -9,7 +9,7 @@ const page = async () => {
   });
   if (data && data.session && data.user) redirect("/");
 
-  return <AuthPage type="login" />;
+  return <AuthPage type="authorize" />;
 };
 
 export default page;
