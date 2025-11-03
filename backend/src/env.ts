@@ -39,7 +39,6 @@ const EnvSchema = z.object({
 
 export type env = z.infer<typeof EnvSchema>;
 
-// biome-ignore lint/nursery/noProcessEnv: <only place in app where this is used>
 const { data: env, error } = EnvSchema.safeParse(process.env);
 
 if (error) {
@@ -48,5 +47,4 @@ if (error) {
   process.exit(1);
 }
 
-// biome-ignore lint/style/noNonNullAssertion: <we know it is present bcz we have thrown error otherwise>
 export default env!;

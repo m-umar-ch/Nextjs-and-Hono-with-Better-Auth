@@ -1,5 +1,5 @@
-// Initialize Sentry before importing other modules
 import { initializeSentry } from "./lib/core/sentry";
+initializeSentry();
 
 import { createRouter } from "./lib/core/create-router";
 import { requestId } from "hono/request-id";
@@ -21,12 +21,7 @@ import { HONO_RESPONSE } from "./lib/utils";
 import { mailerController } from "./modules/mailer/controller/mailer.controller";
 import { auth } from "./modules/auth/service/auth";
 import { authMiddleware } from "./lib/middlewares/auth.middleware";
-import {
-  Auth_CORS_Middleware,
-  CORS_Middleware,
-} from "./lib/middlewares/cors.middleware";
-import { hc } from "hono/client";
-import { hcWithType } from "./client";
+import { Auth_CORS_Middleware } from "./lib/middlewares/cors.middleware";
 
 const createApp = () => {
   const app = createRouter().basePath("/api");
@@ -50,7 +45,6 @@ const createApp = () => {
 };
 
 export const app = createApp();
-initializeSentry();
 configureOpenAPI(app);
 
 // Mount Better Auth handler
@@ -58,8 +52,7 @@ app.on(["POST", "GET"], "/better-auth/*", (c) => {
   return auth.handler(c.req.raw);
 });
 
-app.get("/wallah", (c) => c.json({ helo: "kd" }));
-
+// base route
 app.openapi(
   {
     path: "/",
@@ -92,7 +85,7 @@ HonoLogger(
   `📚 Scalar API documentation available at: http://localhost:${env.PORT}/api/reference`
 );
 
-export type AppType = (typeof controllers)[number];
+// export type AppType = (typeof controllers)[number];
 // export const client = hc<AppType>("http://localhost:8787/");
 /**
  * const requestId = c.get("requestId")
