@@ -16,18 +16,16 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { delayIfDev } from "@/lib/utils/development-delay";
 import { useState } from "react";
-import Link from "next/link";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { env } from "@/env";
 
 export const formSchema = z.object({
   email: z.email(),
-  otp: z.string().min(6, {
-    message: "Your one-time password must be 6 characters.",
-  }),
+  otp: z.string().optional(),
 });
 type FormData = z.infer<typeof formSchema>;
 
@@ -39,7 +37,7 @@ const EmailLoginForm = ({
   const callback = searchParams.get("callback");
   const safeCallback = callback && callback.startsWith("/") ? callback : "/";
   const router = useRouter();
-  const [isOTPView, setIsOTPView] = useState(false);
+  const [isOTPView, setIsOTPView] = useState<string | null>(null);
 
   const SignInWithEmail = useMutation({
     mutationFn: async (email: string) => {
@@ -49,26 +47,12 @@ const EmailLoginForm = ({
         type: "sign-in",
       });
     },
-    onSuccess() {
-      setIsOTPView(true);
-    },
-    onError(error) {
-      toast.error(error?.message || "Something Went Wrong");
-      toast.info("Try Login With Google");
-    },
   });
 
   const VerifyOTP = useMutation({
     mutationFn: async ({ email, otp }: { email: string; otp: string }) => {
       await delayIfDev(2000);
       return await authClient.signIn.emailOtp({ email, otp });
-    },
-    onSuccess() {
-      router.push(`/authorize?callback=${safeCallback}`);
-    },
-    onError(error) {
-      toast.error(error?.message || "Something Went Wrong");
-      toast.info("Try Login With Google");
     },
   });
 
@@ -81,11 +65,49 @@ const EmailLoginForm = ({
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      // SignInWithEmail.mutate(value.email);
+      if (!isOTPView) {
+        SignInWithEmail.mutate(value.email, {
+          onSuccess() {
+            setIsOTPView(value.email);
+          },
+          onError(error) {
+            toast.error(error?.message || "Something Went Wrong");
+            toast.info("Try Login With Google");
+          },
+        });
+      } else {
+        if (!value.otp || value.otp.length < 6) {
+          form.setErrorMap({
+            onSubmit: {
+              fields: {
+                otp: {
+                  message: "Your one-time password must be 6 characters.",
+                },
+              },
+            },
+          });
+        } else {
+          VerifyOTP.mutate(
+            { email: value.email, otp: value.otp },
+            {
+              onSuccess() {
+                toast.success(`Successfully Logged In as ${value.email}`);
+                router.push(
+                  `${env.NEXT_PUBLIC_FRONTEND_BASE_URL}${safeCallback}`
+                );
+              },
+              onError(error) {
+                toast.error(error?.message || "Something Went Wrong");
+                toast.info("Try Login With Google");
+              },
+            }
+          );
+        }
+      }
     },
   });
 
-  if (!isOTPView)
+  if (isOTPView)
     return (
       <form
         onSubmit={(e) => {
@@ -101,6 +123,7 @@ const EmailLoginForm = ({
               {(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
+
                 return (
                   <>
                     <div className="flex items-center">
@@ -110,14 +133,13 @@ const EmailLoginForm = ({
                       >
                         One-Time Password
                       </FieldLabel>
-                      <Link
-                        href={`/signin?callback=${safeCallback}`}
-                        className="ml-auto text-sm underline-offset-4 hover:underline text-destructive"
+                      <p
+                        className="ml-auto text-sm underline-offset-4 hover:underline text-destructive cursor-pointer"
+                        onClick={() => setIsOTPView(null)}
                       >
                         Resend OTP
-                      </Link>
+                      </p>
                     </div>
-
                     <InputOTP
                       maxLength={6}
                       id={field.name}
@@ -155,9 +177,6 @@ const EmailLoginForm = ({
             >
               {VerifyOTP.isPending && <Spinner />} Verify OTP
             </Button>
-            {/* <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="#">Sign up</a>
-              </FieldDescription> */}
           </Field>
         </FieldGroup>
       </form>
@@ -185,7 +204,7 @@ const EmailLoginForm = ({
             disabled={SignInWithEmail.isPending}
             className="cursor-pointer"
           >
-            {SignInWithEmail.isPending && <Spinner />} Login
+            {SignInWithEmail.isPending && <Spinner />} Send OTP
           </Button>
           {/* <FieldDescription className="text-center">
             Don&apos;t have an account? <a href="#">Sign up</a>
