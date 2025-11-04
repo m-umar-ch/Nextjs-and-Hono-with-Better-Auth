@@ -1,0 +1,297 @@
+# Styling Patterns
+
+## Overview
+
+Always use Tailwind CSS for styling and shadcn/ui components from `@/components/ui`. Use the `cn()` utility for conditional class merging.
+
+## Import Statements
+
+```typescript
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+// Import other shadcn/ui components as needed
+```
+
+## Tailwind CSS
+
+### Basic Usage
+
+Always use Tailwind utility classes for styling:
+
+```typescript
+// ✅ CORRECT: Using Tailwind classes
+export function Component() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <h1 className="text-3xl font-semibold tracking-tight">Welcome</h1>
+    </div>
+  );
+}
+```
+
+```typescript
+// ❌ INCORRECT: Using inline styles or CSS modules
+export function Component() {
+  return (
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <h1 className={styles.title}>Welcome</h1>
+    </div>
+  );
+}
+```
+
+### Conditional Classes
+
+Use `cn()` utility for conditional and merged classes:
+
+```typescript
+// ✅ CORRECT: Using cn() for conditional classes
+import { cn } from "@/lib/utils";
+
+export function Button({ variant, disabled }: Props) {
+  return (
+    <button
+      className={cn(
+        "px-4 py-2 rounded-md",
+        variant === "primary" && "bg-blue-500 text-white",
+        variant === "secondary" && "bg-gray-500 text-white",
+        disabled && "opacity-50 cursor-not-allowed"
+      )}
+    >
+      Click me
+    </button>
+  );
+}
+```
+
+```typescript
+// ❌ INCORRECT: Manual class string concatenation
+export function Button({ variant, disabled }: Props) {
+  let className = "px-4 py-2 rounded-md";
+  if (variant === "primary") className += " bg-blue-500 text-white";
+  if (disabled) className += " opacity-50";
+  return <button className={className}>Click me</button>;
+}
+```
+
+## shadcn/ui Components
+
+### Component Usage
+
+Always import and use shadcn/ui components from `@/components/ui`:
+
+```typescript
+// ✅ CORRECT: Using shadcn/ui components
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+
+export function Component() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Title</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Input placeholder="Enter text" />
+        <Button>Submit</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Component Variants
+
+Use component variants provided by shadcn/ui:
+
+```typescript
+import { Button } from "@/components/ui/button";
+
+export function Component() {
+  return (
+    <div>
+      <Button variant="default">Default</Button>
+      <Button variant="destructive">Delete</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link</Button>
+    </div>
+  );
+}
+```
+
+### Customizing Components
+
+Extend shadcn/ui components with Tailwind classes:
+
+```typescript
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+export function CustomButton({ className, ...props }: ButtonProps) {
+  return <Button className={cn("custom-classes-here", className)} {...props} />;
+}
+```
+
+## Best Practices
+
+### DO
+
+- ✅ Always use Tailwind utility classes
+- ✅ Always use `cn()` for conditional and merged classes
+- ✅ Always import components from `@/components/ui`
+- ✅ Use shadcn/ui component variants when available
+- ✅ Follow shadcn/ui component API patterns
+- ✅ Use semantic HTML with Tailwind classes
+- ✅ Leverage Tailwind's responsive utilities
+
+### DON'T
+
+- ❌ Don't use inline styles
+- ❌ Don't use CSS modules or styled-components
+- ❌ Don't create custom components that duplicate shadcn/ui functionality
+- ❌ Don't modify shadcn/ui component files directly
+- ❌ Don't use manual string concatenation for classes
+
+## Responsive Design
+
+Use Tailwind's responsive breakpoints:
+
+```typescript
+export function ResponsiveComponent() {
+  return (
+    <div
+      className="
+      grid
+      grid-cols-1
+      md:grid-cols-2
+      lg:grid-cols-3
+      gap-4
+      p-4
+      md:p-6
+      lg:p-8
+    "
+    >
+      {/* Content */}
+    </div>
+  );
+}
+```
+
+## Dark Mode
+
+shadcn/ui components support dark mode automatically:
+
+```typescript
+export function Component() {
+  return (
+    <div className="bg-background text-foreground">
+      {/* Uses theme colors that adapt to dark mode */}
+      <Card>
+        <CardContent>Content</CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Complete Component Example
+
+```typescript
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export function ProfileCard({ className }: { className?: string }) {
+  return (
+    <Card className={cn("w-full max-w-md", className)}>
+      <CardHeader>
+        <CardTitle>Profile Settings</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" placeholder="Enter your name" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" placeholder="Enter your email" />
+        </div>
+        <Button className="w-full">Save Changes</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Conditional Styling Example
+
+```typescript
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+export function StatusButton({
+  status,
+  ...props
+}: ButtonProps & { status: "active" | "inactive" | "pending" }) {
+  return (
+    <Button
+      className={cn(
+        status === "active" && "bg-green-500 hover:bg-green-600",
+        status === "inactive" && "bg-gray-500 hover:bg-gray-600",
+        status === "pending" && "bg-yellow-500 hover:bg-yellow-600"
+      )}
+      {...props}
+    >
+      {status}
+    </Button>
+  );
+}
+```
+
+### Layout Example
+
+```typescript
+import { cn } from "@/lib/utils";
+import { MaxContainer } from "@/components/MaxContainer";
+
+export function PageLayout({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <main className={cn("min-h-screen bg-background", className)}>
+      <MaxContainer className="py-8">{children}</MaxContainer>
+    </main>
+  );
+}
+```
+
+## Available shadcn/ui Components
+
+Common components available in `@/components/ui`:
+
+- `Button` - Button component with variants
+- `Card`, `CardHeader`, `CardTitle`, `CardContent`, `CardFooter` - Card components
+- `Input` - Input field
+- `Label` - Form label
+- `Textarea` - Textarea field
+- `Select` - Select dropdown
+- `Checkbox` - Checkbox input
+- `Separator` - Divider/separator
+- `Spinner` - Loading spinner
+- `Field`, `FieldLabel`, `FieldError`, `FieldDescription`, `FieldGroup` - Form field components
+- `InputOTP`, `InputOTPGroup`, `InputOTPSlot` - OTP input component
+- `Sonner` (toast) - Toast notifications
+
+Import components as needed from `@/components/ui/{component-name}`.

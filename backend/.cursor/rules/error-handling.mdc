@@ -1,0 +1,386 @@
+# Error Handling Patterns
+
+## Overview
+
+Always prefer using the `tryCatch` function from `@/lib/utils/async-utils.ts` for error handling. This follows the Result pattern, providing better error handling without try-catch blocks.
+
+## Import Statement
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+// or
+import { tryCatch, type Result } from "@/lib/utils/async-utils";
+```
+
+## Basic Usage
+
+### Async Operations
+
+Always wrap async operations with `tryCatch`:
+
+```typescript
+// ✅ CORRECT: Using tryCatch
+const { data, error } = await tryCatch(
+  db.query.user.findFirst({
+    where: eq(user.email, email),
+  })
+);
+
+if (error) {
+  HONO_LOGGER.warn("Could not fetch user", { email, error });
+  // Handle error
+} else {
+  // Use data
+  console.log(data);
+}
+```
+
+```typescript
+// ❌ INCORRECT: Using try-catch
+try {
+  const user = await db.query.user.findFirst({
+    where: eq(user.email, email),
+  });
+  console.log(user);
+} catch (error) {
+  console.error(error);
+}
+```
+
+### Database Queries
+
+```typescript
+// ✅ CORRECT: Using tryCatch with database queries
+const { data: user, error } = await tryCatch(
+  db.query.user.findFirst({
+    where: eq(user.id, userId),
+  })
+);
+
+if (error || !user) {
+  return c.json(HONO_ERROR("NOT_FOUND", "User not found"), HTTP.NOT_FOUND);
+}
+
+return c.json(HONO_RESPONSE({ data: user }), HTTP.OK);
+```
+
+### External API Calls
+
+```typescript
+// ✅ CORRECT: Using tryCatch with external APIs
+const { data: emailResult, error } = await tryCatch(
+  resend.emails.send({
+    from: "onboarding@resend.dev",
+    to: email,
+    subject: "Welcome",
+    html: emailTemplate,
+  })
+);
+
+if (error) {
+  HONO_LOGGER.error("Failed to send email", { email, error });
+  return c.json(
+    HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to send email"),
+    HTTP.INTERNAL_SERVER_ERROR
+  );
+}
+
+HONO_LOGGER.log("Email sent successfully", { email });
+```
+
+## Service Methods
+
+Use `tryCatch` in service methods:
+
+```typescript
+// ✅ CORRECT: Service method with tryCatch
+import { tryCatch } from "@/lib/utils";
+import { HONO_LOGGER } from "@/lib/core/hono-logger";
+
+export class UserService {
+  static async getUserById(userId: string) {
+    const { data: user, error } = await tryCatch(
+      db.query.user.findFirst({
+        where: eq(user.id, userId),
+      })
+    );
+
+    if (error) {
+      HONO_LOGGER.error("Failed to fetch user", { userId, error });
+      throw error;
+    }
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  }
+}
+```
+
+## Route Handlers
+
+Combine `tryCatch` with proper error responses:
+
+```typescript
+// ✅ CORRECT: Route handler with tryCatch
+import { tryCatch } from "@/lib/utils";
+import { HONO_RESPONSE, HONO_ERROR } from "@/lib/utils/response-utils";
+import { HONO_LOGGER } from "@/lib/core/hono-logger";
+import { HTTP } from "@/lib/http/status-codes";
+
+export const handler: AppRouteHandler<typeof route> = async (c) => {
+  const requestId = c.get("requestId");
+  const userId = c.req.param("id");
+
+  HONO_LOGGER.log("Fetching user", { requestId, userId });
+
+  const { data: user, error } = await tryCatch(UserService.getUserById(userId));
+
+  if (error) {
+    HONO_LOGGER.error("Failed to fetch user", { requestId, userId, error });
+    return c.json(
+      HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to fetch user"),
+      HTTP.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  if (!user) {
+    return c.json(HONO_ERROR("NOT_FOUND", "User not found"), HTTP.NOT_FOUND);
+  }
+
+  HONO_LOGGER.log("User fetched successfully", { requestId, userId });
+  return c.json(HONO_RESPONSE({ data: user }), HTTP.OK);
+};
+```
+
+## Result Pattern
+
+The `tryCatch` function returns a `Result<T, E>` type:
+
+```typescript
+type Result<T, E = Error> =
+  | { data: T; error: null; success: true }
+  | { data: null; error: E; success: false };
+```
+
+### Destructuring Pattern
+
+Use destructuring for cleaner code:
+
+```typescript
+// ✅ CORRECT: Destructuring result
+const { data, error } = await tryCatch(someAsyncOperation());
+
+if (error) {
+  // Handle error
+  return;
+}
+
+// Use data (TypeScript knows data is not null here)
+console.log(data);
+```
+
+### Type Guards
+
+Use type guards for better type narrowing:
+
+```typescript
+import { isSuccess, isFailure } from "@/lib/utils";
+
+const result = await tryCatch(someAsyncOperation());
+
+if (isSuccess(result)) {
+  // TypeScript knows result.data is available
+  console.log(result.data);
+}
+
+if (isFailure(result)) {
+  // TypeScript knows result.error is available
+  console.error(result.error);
+}
+```
+
+## Best Practices
+
+### DO
+
+- ✅ Always use `tryCatch` for async operations
+- ✅ Destructure `{ data, error }` from the result
+- ✅ Check for errors before using data
+- ✅ Log errors with context using `HONO_LOGGER`
+- ✅ Return appropriate error responses using `HONO_ERROR`
+- ✅ Use type guards (`isSuccess`, `isFailure`) when needed
+
+### DON'T
+
+- ❌ Don't use try-catch blocks (use `tryCatch` instead)
+- ❌ Don't access `data` without checking for `error` first
+- ❌ Don't ignore errors
+- ❌ Don't throw errors without logging them
+- ❌ Don't use `tryCatch` in route handlers just to re-throw (combine with proper error responses)
+
+## Combining with Logging
+
+Always combine `tryCatch` with structured logging:
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+import { HONO_LOGGER } from "@/lib/core/hono-logger";
+
+export class EmailService {
+  static async sendEmail(email: string, subject: string) {
+    HONO_LOGGER.log("Sending email", { email, subject });
+
+    const { data: result, error } = await tryCatch(
+      resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: email,
+        subject,
+        html: "<p>Hello</p>",
+      })
+    );
+
+    if (error) {
+      HONO_LOGGER.error("Failed to send email", {
+        email,
+        subject,
+        error: error.message,
+      });
+      throw error;
+    }
+
+    HONO_LOGGER.log("Email sent successfully", {
+      email,
+      subject,
+      id: result?.id,
+    });
+
+    return result;
+  }
+}
+```
+
+## Combining with Error Responses
+
+In route handlers, combine `tryCatch` with `HONO_ERROR`:
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+import { HONO_RESPONSE, HONO_ERROR } from "@/lib/utils/response-utils";
+import { HONO_LOGGER } from "@/lib/core/hono-logger";
+import { HTTP } from "@/lib/http/status-codes";
+
+export const handler: AppRouteHandler<typeof route> = async (c) => {
+  const requestId = c.get("requestId");
+  const { email } = c.req.valid("json");
+
+  const { data: user, error } = await tryCatch(
+    db.query.user.findFirst({
+      where: eq(user.email, email),
+    })
+  );
+
+  if (error) {
+    HONO_LOGGER.error("Database error", { requestId, email, error });
+    return c.json(
+      HONO_ERROR("INTERNAL_SERVER_ERROR", "Database error occurred"),
+      HTTP.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  if (!user) {
+    return c.json(HONO_ERROR("NOT_FOUND", "User not found"), HTTP.NOT_FOUND);
+  }
+
+  return c.json(HONO_RESPONSE({ data: user }), HTTP.OK);
+};
+```
+
+## Examples
+
+### Database Query Example
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+import { eq } from "drizzle-orm";
+import { user } from "@/db/schema";
+
+export async function getUserByEmail(email: string) {
+  const { data: foundUser, error } = await tryCatch(
+    db.query.user.findFirst({
+      where: eq(user.email, email),
+    })
+  );
+
+  if (error) {
+    throw new Error(`Failed to query user: ${error.message}`);
+  }
+
+  return foundUser;
+}
+```
+
+### Multiple Async Operations
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+
+export async function createUserWithProfile(userData: any) {
+  // First operation
+  const { data: newUser, error: createError } = await tryCatch(
+    db.insert(user).values(userData).returning()
+  );
+
+  if (createError || !newUser?.[0]) {
+    throw new Error("Failed to create user");
+  }
+
+  // Second operation
+  const { data: profile, error: profileError } = await tryCatch(
+    db.insert(profile).values({ userId: newUser[0].id }).returning()
+  );
+
+  if (profileError) {
+    // Rollback or handle error
+    throw new Error("Failed to create profile");
+  }
+
+  return { user: newUser[0], profile: profile?.[0] };
+}
+```
+
+### Service Method Example
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+import { HONO_LOGGER } from "@/lib/core/hono-logger";
+import { eq } from "drizzle-orm";
+import { user } from "@/db/schema";
+
+export class UserService {
+  static async findByEmail(email: string) {
+    HONO_LOGGER.debug("Finding user by email", { email });
+
+    const { data: foundUser, error } = await tryCatch(
+      db.query.user.findFirst({
+        where: eq(user.email, email),
+      })
+    );
+
+    if (error) {
+      HONO_LOGGER.error("Database query failed", { email, error });
+      throw error;
+    }
+
+    if (!foundUser) {
+      HONO_LOGGER.warn("User not found", { email });
+      return null;
+    }
+
+    HONO_LOGGER.debug("User found", { email, userId: foundUser.id });
+    return foundUser;
+  }
+}
+```

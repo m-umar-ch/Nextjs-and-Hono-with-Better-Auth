@@ -1,0 +1,385 @@
+# Data Fetching Patterns
+
+## Overview
+
+Always use TanStack Query for client-side queries and mutations. Use OpenAPI Fetch client for type-safe API calls. Never use `fetch` directly in client components.
+
+## Import Statements
+
+```typescript
+// Client components
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+
+// Server components
+import { api } from "@/DAL/utils/server";
+import { tryCatch } from "@/lib/utils";
+```
+
+## Client Components - Queries
+
+### Basic Query Pattern
+
+Always use `useQuery` for GET requests:
+
+```typescript
+// ✅ CORRECT: Using TanStack Query
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+
+export function UserProfile() {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: () => api.GET("/api/user/profile"),
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>{data?.data?.name}</div>;
+}
+```
+
+```typescript
+// ❌ INCORRECT: Using fetch directly
+"use client";
+
+export function UserProfile() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/user/profile")
+      .then((res) => res.json())
+      .then(setData);
+  }, []);
+
+  return <div>{data?.name}</div>;
+}
+```
+
+### Query with Parameters
+
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+
+export function UserProfile({ userId }: { userId: string }) {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["user-profile", userId],
+    queryFn: () =>
+      api.GET("/api/user/{id}", {
+        params: { path: { id: userId } },
+      }),
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>{data?.data?.name}</div>;
+}
+```
+
+### Query with Options
+
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+
+export function UserProfile() {
+  const { data, error, isLoading, refetch } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: () => api.GET("/api/user/profile"),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div>
+      <div>{data?.data?.name}</div>
+      <button onClick={() => refetch()}>Refresh</button>
+    </div>
+  );
+}
+```
+
+## Client Components - Mutations
+
+### Basic Mutation Pattern
+
+Always use `useMutation` for POST, PUT, DELETE requests:
+
+```typescript
+// ✅ CORRECT: Using TanStack Query mutation
+"use client";
+
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+import { toast } from "sonner";
+
+export function UpdateProfile() {
+  const mutation = useMutation({
+    mutationFn: async (data: { name: string }) => {
+      return await api.PUT("/api/user/profile", { body: data });
+    },
+    onSuccess: () => {
+      toast.success("Profile updated!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile");
+    },
+  });
+
+  const handleSubmit = (formData: { name: string }) => {
+    mutation.mutate(formData);
+  };
+
+  return (
+    <button
+      onClick={() => handleSubmit({ name: "New Name" })}
+      disabled={mutation.isPending}
+    >
+      {mutation.isPending ? "Updating..." : "Update Profile"}
+    </button>
+  );
+}
+```
+
+### Mutation with Query Invalidation
+
+```typescript
+"use client";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+import { toast } from "sonner";
+
+export function UpdateProfile() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: { name: string }) => {
+      return await api.PUT("/api/user/profile", { body: data });
+    },
+    onSuccess: () => {
+      // Invalidate and refetch user profile
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+      toast.success("Profile updated!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile");
+    },
+  });
+
+  return (
+    <button
+      onClick={() => mutation.mutate({ name: "New Name" })}
+      disabled={mutation.isPending}
+    >
+      Update
+    </button>
+  );
+}
+```
+
+## Server Components
+
+In server components, use the server API client with `tryCatch`:
+
+```typescript
+// ✅ CORRECT: Server component with tryCatch
+import { api } from "@/DAL/utils/server";
+import { tryCatch } from "@/lib/utils";
+
+export default async function ServerPage() {
+  const { data: response, error } = await tryCatch(
+    api.GET("/api/user/profile")
+  );
+
+  if (!response || error) {
+    return <div>Error loading profile</div>;
+  }
+
+  return <div>{response.data.name}</div>;
+}
+```
+
+```typescript
+// ❌ INCORRECT: Using fetch in server component
+export default async function ServerPage() {
+  const res = await fetch("/api/user/profile");
+  const data = await res.json();
+  return <div>{data.name}</div>;
+}
+```
+
+## Best Practices
+
+### DO
+
+- ✅ Always use TanStack Query (`useQuery`, `useMutation`) in client components
+- ✅ Always use OpenAPI Fetch client (`api` from `@/DAL/utils/client` or `@/DAL/utils/server`)
+- ✅ Use `tryCatch` with API calls in server components
+- ✅ Use descriptive query keys (e.g., `["user-profile", userId]`)
+- ✅ Invalidate queries after mutations
+- ✅ Handle loading and error states
+- ✅ Use query options for caching and refetching behavior
+
+### DON'T
+
+- ❌ Never use `fetch` directly in client components
+- ❌ Don't use `useEffect` for data fetching in client components
+- ❌ Don't forget to handle loading and error states
+- ❌ Don't create duplicate query keys
+- ❌ Don't mutate data without invalidating related queries
+
+## Query Keys Pattern
+
+Use consistent query key patterns:
+
+```typescript
+// Single resource
+["user-profile"][("user", userId)][
+  // List resources
+  "users"
+][("users", { page: 1, limit: 10 })][
+  // Nested resources
+  ("user", userId, "posts")
+][("user", userId, "posts", postId)];
+```
+
+## Examples
+
+### Complete Query Example
+
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+import { Spinner } from "@/components/ui/spinner";
+
+export function UserList() {
+  const { data, error, isLoading, refetch } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => api.GET("/api/users"),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500">
+        Error: {error.message}
+        <button onClick={() => refetch()}>Retry</button>
+      </div>
+    );
+  }
+
+  return (
+    <ul>
+      {data?.data?.map((user) => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Complete Mutation Example
+
+```typescript
+"use client";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+
+export function DeleteUser({ userId }: { userId: string }) {
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      return await api.DELETE("/api/user/{id}", {
+        params: { path: { id: userId } },
+      });
+    },
+    onSuccess: () => {
+      // Invalidate users list
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("User deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete user");
+    },
+  });
+
+  return (
+    <Button
+      onClick={() => deleteMutation.mutate()}
+      disabled={deleteMutation.isPending}
+      variant="destructive"
+    >
+      {deleteMutation.isPending && <Spinner />}
+      Delete User
+    </Button>
+  );
+}
+```
+
+### Server Component Example
+
+```typescript
+import { api } from "@/DAL/utils/server";
+import { tryCatch } from "@/lib/utils";
+import { authClient } from "@/auth/auth-client";
+import { headers } from "next/headers";
+
+export default async function UserDashboard() {
+  // Fetch session
+  const sessionResult = await tryCatch(
+    authClient.getSession({
+      fetchOptions: { headers: await headers() },
+    })
+  );
+
+  if (!sessionResult.success || !sessionResult.data?.data?.user) {
+    return <div>Not authenticated</div>;
+  }
+
+  const user = sessionResult.data.data.user;
+
+  // Fetch user data
+  const { data: profileResult, error } = await tryCatch(
+    api.GET("/api/user/profile")
+  );
+
+  if (!profileResult || error) {
+    return <div>Error loading profile</div>;
+  }
+
+  return (
+    <div>
+      <h1>Welcome {user.email}</h1>
+      <p>Profile: {profileResult.data.name}</p>
+    </div>
+  );
+}
+```

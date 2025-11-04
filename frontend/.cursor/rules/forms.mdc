@@ -1,0 +1,449 @@
+# Form Patterns
+
+## Overview
+
+Always use TanStack Form (`useAppForm` hook) with Zod for schema validation. Use form components from `@/components/common/form`.
+
+## Import Statements
+
+```typescript
+import { useAppForm } from "@/components/common/form/hooks";
+import { z } from "zod";
+import {
+  FormInput,
+  FormTextarea,
+  FormSelect,
+  FormCheckbox,
+} from "@/components/common/form";
+```
+
+## Basic Form Pattern
+
+### Define Schema
+
+Always define a Zod schema for form validation:
+
+```typescript
+// ✅ CORRECT: Using Zod schema
+import { z } from "zod";
+
+const formSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  name: z.string().min(1, "Name is required"),
+  age: z.number().min(18, "Must be 18 or older").optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
+```
+
+### Create Form Component
+
+```typescript
+// ✅ CORRECT: Using TanStack Form with Zod
+"use client";
+
+import { useAppForm } from "@/components/common/form/hooks";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+
+const formSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+export function MyForm() {
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      name: "",
+    } satisfies FormData as FormData,
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      // Handle form submission
+      console.log(value);
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <form.AppField name="email">
+        {(field) => (
+          <field.Input label="Email" type="email" placeHolder="Enter Email" />
+        )}
+      </form.AppField>
+
+      <form.AppField name="name">
+        {(field) => (
+          <field.Input label="Name" type="text" placeHolder="Enter Name" />
+        )}
+      </form.AppField>
+
+      <Button type="submit">Submit</Button>
+    </form>
+  );
+}
+```
+
+```typescript
+// ❌ INCORRECT: Using React Hook Form or native form
+"use client";
+
+import { useForm } from "react-hook-form"; // DON'T DO THIS
+
+export function MyForm() {
+  const { register, handleSubmit } = useForm();
+  // ...
+}
+```
+
+## Form with Mutation
+
+Combine TanStack Form with TanStack Query mutations:
+
+```typescript
+"use client";
+
+import { useAppForm } from "@/components/common/form/hooks";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { api } from "@/DAL/utils/client";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+
+const formSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+export function UpdateProfileForm() {
+  const updateMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      return await api.PUT("/api/user/profile", { body: data });
+    },
+    onSuccess: () => {
+      toast.success("Profile updated!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile");
+    },
+  });
+
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      name: "",
+    } satisfies FormData as FormData,
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      updateMutation.mutate(value);
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <form.AppField name="email">
+        {(field) => (
+          <field.Input label="Email" type="email" PlaceHolder="Enter Email" />
+        )}
+      </form.AppField>
+
+      <form.AppField name="name">
+        {(field) => (
+          <field.Input label="Name" type="text" placeHolder="Enter Name" />
+        )}
+      </form.AppField>
+
+      <Button type="submit" disabled={updateMutation.isPending}>
+        {updateMutation.isPending && <Spinner />}
+        Update Profile
+      </Button>
+    </form>
+  );
+}
+```
+
+## Form Field Components
+
+Use the provided form field components:
+
+### FormInput
+
+```typescript
+<form.AppField name="email">
+  {(field) => (
+    <field.Input label="Email" type="email" placeHolder="Enter Email" />
+  )}
+</form.AppField>
+```
+
+### FormTextarea
+
+```typescript
+<form.AppField name="description">
+  {(field) => (
+    <field.Textarea label="Description" placeHolder="Enter Description" />
+  )}
+</form.AppField>
+```
+
+### FormSelect
+
+```typescript
+<form.AppField name="role">
+  {(field) => (
+    <field.Select label="Role" placeHolder="Select Role">
+      <option value="admin">Admin</option>
+      <option value="user">User</option>
+    </field.Select>
+  )}
+</form.AppField>
+```
+
+### FormCheckbox
+
+```typescript
+<form.AppField name="agree">
+  {(field) => <field.Checkbox label="I agree to the terms" controlFirst />}
+</form.AppField>
+```
+
+## Custom Field Rendering
+
+For custom field rendering, use the field render prop:
+
+```typescript
+<form.AppField name="otp">
+  {(field) => {
+    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+    return (
+      <>
+        <FieldLabel htmlFor={field.name}>One-Time Password</FieldLabel>
+        <InputOTP
+          maxLength={6}
+          value={field.state.value}
+          onChange={(e) => field.handleChange(e)}
+          onBlur={field.handleBlur}
+        >
+          {/* OTP slots */}
+        </InputOTP>
+        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+      </>
+    );
+  }}
+</form.AppField>
+```
+
+## Form Validation
+
+### Schema Validation
+
+Define validation rules in Zod schema:
+
+```typescript
+const formSchema = z
+  .object({
+    email: z.string().email("Invalid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain an uppercase letter")
+      .regex(/[a-z]/, "Password must contain a lowercase letter")
+      .regex(/[0-9]/, "Password must contain a number"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+```
+
+### Custom Validation
+
+Add custom validation in the form configuration:
+
+```typescript
+const form = useAppForm({
+  defaultValues: {
+    email: "",
+    otp: "",
+  } satisfies FormData as FormData,
+  validators: {
+    onSubmit: formSchema,
+    onChange: ({ value }) => {
+      // Custom validation logic
+      if (value.otp && value.otp.length < 6) {
+        return {
+          fields: {
+            otp: {
+              message: "OTP must be 6 characters",
+            },
+          },
+        };
+      }
+    },
+  },
+  onSubmit: async ({ value }) => {
+    // Handle submission
+  },
+});
+```
+
+### Manual Error Setting
+
+Set errors manually when needed:
+
+```typescript
+const form = useAppForm({
+  // ...
+  onSubmit: async ({ value }) => {
+    if (!value.otp || value.otp.length < 6) {
+      form.setErrorMap({
+        onSubmit: {
+          fields: {
+            otp: {
+              message: "Your one-time password must be 6 characters.",
+            },
+          },
+        },
+      });
+      return;
+    }
+    // Continue with submission
+  },
+});
+```
+
+## Best Practices
+
+### DO
+
+- ✅ Always use `useAppForm` from `@/components/common/form/hooks`
+- ✅ Always define Zod schemas for form validation
+- ✅ Use `type FormData = z.infer<typeof formSchema>` for type inference
+- ✅ Use form field components (`FormInput`, `FormTextarea`, etc.)
+- ✅ Combine forms with TanStack Query mutations
+- ✅ Handle form submission errors
+- ✅ Provide meaningful validation messages
+
+### DON'T
+
+- ❌ Don't use React Hook Form or other form libraries
+- ❌ Don't use native HTML form validation
+- ❌ Don't skip schema validation
+- ❌ Don't forget to mark forms as `"use client"`
+- ❌ Don't forget to prevent default form submission
+
+## Examples
+
+### Complete Form Example
+
+```typescript
+"use client";
+
+import { useAppForm } from "@/components/common/form/hooks";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { api } from "@/DAL/utils/client";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { FieldGroup } from "@/components/ui/field";
+
+const formSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  name: z.string().min(1, "Name is required"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+export function ContactForm() {
+  const contactMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      return await api.POST("/api/contact", { body: data });
+    },
+    onSuccess: () => {
+      toast.success("Message sent successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send message");
+    },
+  });
+
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      name: "",
+      message: "",
+    } satisfies FormData as FormData,
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      contactMutation.mutate(value);
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <FieldGroup>
+        <form.AppField name="email">
+          {(field) => (
+            <field.Input
+              label="Email"
+              type="email"
+              placeHolder="Enter your email"
+            />
+          )}
+        </form.AppField>
+
+        <form.AppField name="name">
+          {(field) => (
+            <field.Input
+              label="Name"
+              type="text"
+              placeHolder="Enter your name"
+            />
+          )}
+        </form.AppField>
+
+        <form.AppField name="message">
+          {(field) => (
+            <field.Textarea label="Message" placeHolder="Enter your message" />
+          )}
+        </form.AppField>
+
+        <Button type="submit" disabled={contactMutation.isPending}>
+          {contactMutation.isPending && <Spinner />}
+          Send Message
+        </Button>
+      </FieldGroup>
+    </form>
+  );
+}
+```

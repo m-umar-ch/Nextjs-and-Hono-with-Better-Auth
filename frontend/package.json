@@ -1,5 +1,5 @@
 {
-  "name": "ecom-frontend",
+  "name": "hono-starter-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "openapi": "bunx openapi-typescript http://localhost:9999/api/doc?api=auth -o ./src/DAL/api-types.d.ts"
+    "openapi": "bunx openapi-typescript http://localhost:9999/api/doc -o ./src/DAL/api-types.d.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -36,7 +36,8 @@
     "sonner": "^2.0.7",
     "superjson": "^2.2.5",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

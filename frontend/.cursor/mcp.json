@@ -1,0 +1,118 @@
+{
+  "name": "nextjs-frontend-rules",
+  "version": "1.0.0",
+  "description": "Coding rules and conventions for the Next.js Frontend project",
+  "rules": {
+    "error-handling": {
+      "file": "./rules/error-handling.mdc",
+      "description": "Error handling patterns using tryCatch and Result pattern",
+      "categories": ["error-handling", "async", "typescript"],
+      "priority": "high"
+    },
+    "authentication": {
+      "file": "./rules/authentication.mdc",
+      "description": "Authentication patterns for server and client components",
+      "categories": ["authentication", "server-components", "security"],
+      "priority": "high"
+    },
+    "data-fetching": {
+      "file": "./rules/data-fetching.mdc",
+      "description": "Data fetching patterns using TanStack Query and OpenAPI Fetch",
+      "categories": ["data-fetching", "api", "react-query"],
+      "priority": "high"
+    },
+    "forms": {
+      "file": "./rules/forms.mdc",
+      "description": "Form patterns using TanStack Form and Zod validation",
+      "categories": ["forms", "validation", "react-form"],
+      "priority": "high"
+    },
+    "styling": {
+      "file": "./rules/styling.mdc",
+      "description": "Styling patterns using Tailwind CSS and shadcn/ui",
+      "categories": ["styling", "ui", "tailwind"],
+      "priority": "medium"
+    }
+  },
+  "categories": {
+    "error-handling": {
+      "description": "Error handling and async operation patterns"
+    },
+    "async": {
+      "description": "Asynchronous operation patterns"
+    },
+    "typescript": {
+      "description": "TypeScript patterns and type safety"
+    },
+    "authentication": {
+      "description": "Authentication and authorization patterns"
+    },
+    "server-components": {
+      "description": "Next.js server component patterns"
+    },
+    "security": {
+      "description": "Security best practices"
+    },
+    "data-fetching": {
+      "description": "Data fetching and API call patterns"
+    },
+    "api": {
+      "description": "API integration patterns"
+    },
+    "react-query": {
+      "description": "TanStack Query usage patterns"
+    },
+    "forms": {
+      "description": "Form handling and validation patterns"
+    },
+    "validation": {
+      "description": "Input validation patterns"
+    },
+    "react-form": {
+      "description": "TanStack Form usage patterns"
+    },
+    "styling": {
+      "description": "CSS and styling patterns"
+    },
+    "ui": {
+      "description": "UI component patterns"
+    },
+    "tailwind": {
+      "description": "Tailwind CSS usage patterns"
+    }
+  },
+  "enforcement": {
+    "strict": ["error-handling", "authentication", "data-fetching", "forms"],
+    "recommended": ["styling"]
+  },
+  "tools": {
+    "framework": "Next.js 16 (App Router)",
+    "react": "React 19",
+    "runtime": "Bun",
+    "styling": "Tailwind CSS",
+    "components": "shadcn/ui",
+    "forms": "TanStack Form (@tanstack/react-form)",
+    "validation": "Zod",
+    "data-fetching": "TanStack Query (@tanstack/react-query)",
+    "api-client": "OpenAPI Fetch (openapi-fetch)",
+    "authentication": "Better Auth",
+    "monitoring": "Sentry (optional)"
+  },
+  "project-structure": {
+    "app-router": true,
+    "route-groups": ["(auth)", "(root)"],
+    "component-patterns": {
+      "server-components": "Default, no 'use client' directive",
+      "client-components": "Requires 'use client' directive",
+      "forms": "Always client components with TanStack Form",
+      "data-fetching": "Server components with tryCatch, client components with TanStack Query"
+    }
+  },
+  "metadata": {
+    "created": "2025-01-27",
+    "lastUpdated": "2025-01-27",
+    "version": "1.0.0",
+    "maintainer": "Development Team",
+    "project-type": "Next.js 16 frontend with Better Auth, TanStack Query, TanStack Form, and shadcn/ui"
+  }
+}

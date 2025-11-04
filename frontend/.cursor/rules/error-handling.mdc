@@ -1,0 +1,290 @@
+# Error Handling Patterns
+
+## Overview
+
+Always prefer using the `tryCatch` function from `@/lib/utils/async-utils.ts` for error handling. This follows the Result pattern, providing better error handling without try-catch blocks.
+
+## Import Statement
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+// or
+import { tryCatch, type Result } from "@/lib/utils/async-utils";
+```
+
+## Basic Usage
+
+### Async Operations
+
+Always wrap async operations with `tryCatch`:
+
+```typescript
+// ✅ CORRECT: Using tryCatch
+const result = await tryCatch(
+  authClient.getSession({
+    fetchOptions: { headers: await headers() },
+  })
+);
+
+if (result.success) {
+  const user = result.data?.data?.user;
+  // Use user data
+} else {
+  // Handle error
+  console.error(result.error);
+}
+```
+
+```typescript
+// ❌ INCORRECT: Using try-catch
+try {
+  const { data } = await authClient.getSession({
+    fetchOptions: { headers: await headers() },
+  });
+  const user = data?.user;
+} catch (error) {
+  console.error(error);
+}
+```
+
+### API Calls
+
+```typescript
+// ✅ CORRECT: Using tryCatch with API calls
+const { data: response, error } = await tryCatch(api.GET("/api/user/profile"));
+
+if (!response || error) {
+  return <div>Error loading profile</div>;
+}
+
+return <div>{response.data.name}</div>;
+```
+
+### Multiple Async Operations
+
+```typescript
+// ✅ CORRECT: Sequential operations
+const sessionResult = await tryCatch(
+  authClient.getSession({
+    fetchOptions: { headers: await headers() },
+  })
+);
+
+if (!sessionResult.success) {
+  return <div>Not authenticated</div>;
+}
+
+const { data: profileResult, error } = await tryCatch(
+  api.GET("/api/user/profile")
+);
+
+if (!profileResult || error) {
+  return <div>Error loading profile</div>;
+}
+```
+
+## Result Pattern
+
+The `tryCatch` function returns a `Result<T, E>` type:
+
+```typescript
+type Result<T, E = Error> =
+  | { data: T; error: null; success: true }
+  | { data: null; error: E; success: false };
+```
+
+### Type Guards
+
+Use type guards for better type narrowing:
+
+```typescript
+import { isSuccess, isFailure } from "@/lib/utils";
+
+const result = await tryCatch(someAsyncOperation());
+
+if (isSuccess(result)) {
+  // TypeScript knows result.data is available
+  console.log(result.data);
+}
+
+if (isFailure(result)) {
+  // TypeScript knows result.error is available
+  console.error(result.error);
+}
+```
+
+## Server Components
+
+In server components, always use `tryCatch` for async operations:
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+import { authClient } from "@/auth/auth-client";
+import { headers } from "next/headers";
+import { api } from "@/DAL/utils/server";
+
+export default async function ServerComponent() {
+  // Fetch session with error handling
+  const sessionResult = await tryCatch(
+    authClient.getSession({
+      fetchOptions: { headers: await headers() },
+    })
+  );
+
+  if (!sessionResult.success) {
+    return <div>Authentication error</div>;
+  }
+
+  const user = sessionResult.data?.data?.user;
+
+  // Fetch data with error handling
+  const { data: response, error } = await tryCatch(
+    api.GET("/api/user/profile")
+  );
+
+  if (!response || error) {
+    return <div>Error loading data</div>;
+  }
+
+  return (
+    <div>
+      <h1>Welcome {user?.email}</h1>
+      <p>{response.data.profile}</p>
+    </div>
+  );
+}
+```
+
+## Client Components
+
+In client components, TanStack Query handles errors automatically, but you can still use `tryCatch` for operations outside queries:
+
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { tryCatch } from "@/lib/utils";
+import { api } from "@/DAL/utils/client";
+
+export function ClientComponent() {
+  // TanStack Query handles errors automatically
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: () => api.GET("/api/user/profile"),
+  });
+
+  // But use tryCatch for other async operations
+  const handleAction = async () => {
+    const result = await tryCatch(someAsyncOperation());
+    if (!result.success) {
+      // Handle error
+      return;
+    }
+    // Use result.data
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>{/* Component */}</div>;
+}
+```
+
+## Best Practices
+
+### DO
+
+- ✅ Always use `tryCatch` for async operations
+- ✅ Check `result.success` before accessing `result.data`
+- ✅ Use type guards (`isSuccess`, `isFailure`) for better type safety
+- ✅ Handle errors gracefully
+- ✅ Provide meaningful error messages to users
+
+### DON'T
+
+- ❌ Don't use try-catch blocks (use `tryCatch` instead)
+- ❌ Don't access `result.data` without checking `result.success`
+- ❌ Don't ignore errors
+- ❌ Don't throw errors in async functions (let `tryCatch` handle it)
+
+## Error Handling in Forms
+
+For form submissions, TanStack Query mutations handle errors, but you can wrap them:
+
+```typescript
+"use client";
+
+import { useMutation } from "@tanstack/react-query";
+import { tryCatch } from "@/lib/utils";
+import { api } from "@/DAL/utils/client";
+
+export function FormComponent() {
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      // The mutation function itself doesn't need tryCatch
+      // TanStack Query will catch errors
+      return await api.POST("/api/user/update", { body: data });
+    },
+    onError: (error) => {
+      // Handle error here
+      console.error(error);
+    },
+  });
+
+  // For operations outside mutations, use tryCatch
+  const handlePreSubmit = async () => {
+    const result = await tryCatch(someValidation());
+    if (!result.success) {
+      return;
+    }
+    mutation.mutate(formData);
+  };
+}
+```
+
+## Examples
+
+### Authentication Check
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+import { authClient } from "@/auth/auth-client";
+import { headers } from "next/headers";
+
+export default async function ProtectedPage() {
+  const sessionResult = await tryCatch(
+    authClient.getSession({
+      fetchOptions: { headers: await headers() },
+    })
+  );
+
+  if (!sessionResult.success || !sessionResult.data?.data?.user) {
+    redirect("/login");
+  }
+
+  const user = sessionResult.data.data.user;
+  return <div>Protected content for {user.email}</div>;
+}
+```
+
+### Data Fetching with Fallback
+
+```typescript
+import { tryCatch } from "@/lib/utils";
+import { api } from "@/DAL/utils/server";
+
+export default async function DataPage() {
+  const { data: response, error } = await tryCatch(api.GET("/api/data"));
+
+  if (!response || error) {
+    return (
+      <div>
+        <h1>Error loading data</h1>
+        <p>Please try again later.</p>
+      </div>
+    );
+  }
+
+  return <div>{/* Render data */}</div>;
+}
+```

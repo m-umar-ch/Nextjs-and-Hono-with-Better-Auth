@@ -36,6 +36,29 @@ export interface paths {
                         };
                     };
                 };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
                 /** @description Unprocessable Entity - Validation errors */
                 422: {
                     headers: {

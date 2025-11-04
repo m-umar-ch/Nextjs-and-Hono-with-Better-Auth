@@ -1,5 +1,5 @@
 import { createRoute, RouteHandler, z } from "@hono/zod-openapi";
-import { moduleTags } from "../../module.tags";
+import { moduleTags } from "@/modules/module.tags";
 import { HTTP } from "@/lib/http/status-codes";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_RESPONSE, HONO_ERROR } from "@/lib/utils";

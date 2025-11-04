@@ -1,0 +1,286 @@
+# Next.js Frontend Project Rules
+
+This document contains the coding standards, patterns, and conventions for the Next.js Frontend project.
+
+## Overview
+
+This project follows modern React and Next.js best practices with emphasis on:
+
+- **Type Safety**: Full TypeScript coverage with proper typing
+- **Error Handling**: Result pattern using `tryCatch` utility
+- **Authentication**: Server-side session fetching in server components
+- **Data Fetching**: TanStack Query for all client-side API calls
+- **Forms**: TanStack Form with Zod validation
+- **Styling**: Tailwind CSS with shadcn/ui components
+
+## Rule Categories
+
+### 1. [Error Handling](./rules/error-handling.mdc)
+
+- Prefer `tryCatch` function from `@/lib/utils/async-utils.ts`
+- Result pattern for better error handling
+- Avoid try-catch blocks where possible
+
+**Key Points:**
+
+- Always use `tryCatch` for async operations
+- Check `result.success` before accessing data
+- Handle errors gracefully with Result pattern
+
+### 2. [Authentication](./rules/authentication.mdc)
+
+- Server components: Always fetch session using `authClient.getSession()`
+- Can wrap session fetching in `tryCatch` for error handling
+- Never use `useSession` hook
+
+**Key Points:**
+
+- Use `authClient.getSession({ fetchOptions: { headers: await headers() } })` in server components
+- Wrap in `tryCatch` for safer error handling
+- Access user via `data?.user`
+
+### 3. [Data Fetching](./rules/data-fetching.mdc)
+
+- Always use TanStack Query for client-side queries and mutations
+- Use `useQuery` for GET requests
+- Use `useMutation` for POST, PUT, DELETE requests
+- Use OpenAPI Fetch client for type-safe API calls
+
+**Key Points:**
+
+- Never use `fetch` directly in client components
+- Always use TanStack Query hooks
+- Use `api` from `@/DAL/utils/client` for client components
+- Use `api` from `@/DAL/utils/server` for server components
+
+### 4. [Forms](./rules/forms.mdc)
+
+- Always use TanStack Form (`useAppForm` hook)
+- Always use Zod for schema validation
+- Use form components from `@/components/common/form`
+
+**Key Points:**
+
+- Use `useAppForm` from `@/components/common/form/hooks`
+- Define schemas with Zod
+- Use `formSchema` pattern for type inference
+- Use form field components (`FormInput`, `FormTextarea`, etc.)
+
+### 5. [Styling](./rules/styling.mdc)
+
+- Always use Tailwind CSS for styling
+- Always use shadcn/ui components from `@/components/ui`
+- Use `cn()` utility for conditional classes
+- Follow shadcn/ui component patterns
+
+**Key Points:**
+
+- Import components from `@/components/ui`
+- Use Tailwind utility classes
+- Use `cn()` from `@/lib/utils` for class merging
+- Follow shadcn/ui component API patterns
+
+## Project Structure
+
+```
+src/
+├── app/                      # Next.js App Router
+│   ├── (auth)/              # Auth route group
+│   │   ├── login/           # Login page
+│   │   └── _components/     # Auth-specific components
+│   └── (root)/              # Root route group
+│       ├── page.tsx         # Home page
+│       └── layout.tsx       # Root layout
+├── auth/                     # Better Auth client
+│   ├── auth-client.ts       # Auth client instance
+│   └── permissions.ts       # RBAC permissions
+├── components/               # React components
+│   ├── common/              # Common components
+│   │   └── form/            # Form components (TanStack Form)
+│   └── ui/                  # shadcn/ui components
+├── DAL/                      # Data Access Layer
+│   ├── api-types.d.ts       # Auto-generated OpenAPI types
+│   └── utils/               # API client utilities
+│       ├── client.ts        # Client-side API client
+│       └── server.ts        # Server-side API client
+└── lib/                      # Utilities and configs
+    ├── utils/               # Utility functions
+    │   ├── async-utils.ts   # tryCatch, Result pattern
+    │   └── index.ts         # Utility exports
+    └── config/              # Configuration files
+```
+
+## Quick Reference
+
+### Server Component Template
+
+```typescript
+import { authClient } from "@/auth/auth-client";
+import { headers } from "next/headers";
+import { tryCatch } from "@/lib/utils";
+import { api } from "@/DAL/utils/server";
+
+export default async function ServerComponent() {
+  // Fetch session with error handling
+  const sessionResult = await tryCatch(
+    authClient.getSession({
+      fetchOptions: { headers: await headers() },
+    })
+  );
+
+  const user = sessionResult.success ? sessionResult.data?.data?.user : null;
+
+  // Fetch data with error handling
+  const { data: response, error } = await tryCatch(
+    api.GET("/api/user/profile")
+  );
+
+  if (!response || error) {
+    return <div>Error loading data</div>;
+  }
+
+  return <div>{/* Your component */}</div>;
+}
+```
+
+### Client Component with Query Template
+
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+
+export function ClientComponent() {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["user-profile"],
+    queryFn: () => api.GET("/api/user/profile"),
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>{/* Your component */}</div>;
+}
+```
+
+### Client Component with Mutation Template
+
+```typescript
+"use client";
+
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/DAL/utils/client";
+import { toast } from "sonner";
+
+export function ClientComponent() {
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      return await api.POST("/api/user/update", { body: data });
+    },
+    onSuccess: () => {
+      toast.success("Success!");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  return <button onClick={() => mutation.mutate(formData)}>Submit</button>;
+}
+```
+
+### Form Component Template
+
+```typescript
+"use client";
+
+import { useAppForm } from "@/components/common/form/hooks";
+import { z } from "zod";
+import { FormInput } from "@/components/common/form/FormInput";
+
+const formSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+export function MyForm() {
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      name: "",
+    } satisfies FormData as FormData,
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      // Handle form submission
+      console.log(value);
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <form.AppField name="email">
+        {(field) => (
+          <field.Input label="Email" type="email" placeHolder="Enter Email" />
+        )}
+      </form.AppField>
+    </form>
+  );
+}
+```
+
+## Development Guidelines
+
+### Code Quality
+
+- Follow TypeScript strict mode
+- Use Result pattern for error handling
+- Include proper type annotations
+- Write descriptive variable and function names
+
+### Performance
+
+- Use server components by default
+- Only use client components when necessary (`"use client"`)
+- Leverage React Server Components for data fetching
+- Use TanStack Query for client-side caching
+
+### Security
+
+- Never expose sensitive data in client components
+- Always validate inputs with Zod schemas
+- Use server-side session checking for protected routes
+- Sanitize user inputs
+
+## Tools and Dependencies
+
+- **Framework**: Next.js 16 (App Router)
+- **React**: React 19
+- **Runtime**: Bun
+- **Styling**: Tailwind CSS
+- **Components**: shadcn/ui
+- **Forms**: TanStack Form (@tanstack/react-form)
+- **Validation**: Zod
+- **Data Fetching**: TanStack Query (@tanstack/react-query)
+- **API Client**: OpenAPI Fetch (openapi-fetch)
+- **Authentication**: Better Auth
+- **Error Monitoring**: Sentry (optional)
+
+## Getting Started
+
+1. Follow error handling patterns with `tryCatch`
+2. Always fetch sessions in server components
+3. Use TanStack Query for all client-side data fetching
+4. Use TanStack Form with Zod for all forms
+5. Use Tailwind and shadcn/ui for styling
+
+For detailed information on each topic, refer to the specific rule files in the `rules/` directory.
