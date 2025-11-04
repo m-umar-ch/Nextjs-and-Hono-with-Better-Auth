@@ -15,7 +15,7 @@ import { authClient } from "@/auth/auth-client";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { delayIfDev } from "@/lib/utils/development-delay";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
   InputOTP,
   InputOTPGroup,
@@ -31,13 +31,17 @@ type FormData = z.infer<typeof formSchema>;
 
 const EmailLoginForm = ({
   className,
+  isOTPView,
+  setIsOTPView,
   ...props
-}: React.ComponentProps<"form">) => {
+}: React.ComponentProps<"form"> & {
+  isOTPView: string | null;
+  setIsOTPView: Dispatch<SetStateAction<string | null>>;
+}) => {
   const searchParams = useSearchParams();
   const callback = searchParams.get("callback");
   const safeCallback = callback && callback.startsWith("/") ? callback : "/";
   const router = useRouter();
-  const [isOTPView, setIsOTPView] = useState<string | null>(null);
 
   const SignInWithEmail = useMutation({
     mutationFn: async (email: string) => {

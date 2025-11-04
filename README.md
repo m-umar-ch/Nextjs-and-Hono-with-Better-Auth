@@ -463,25 +463,62 @@ This project supports two authentication methods:
 
 #### Server Components (Frontend)
 
+Always use the provided utilities from `@/DAL/auth`:
+
 ```ts
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
+import { getUser } from "@/DAL/auth";
+import { redirect } from "next/navigation";
 
-const { data } = await authClient.getSession({
-  fetchOptions: { headers: await headers() },
-});
+export default async function Page() {
+  const user = await getUser();
 
-const user = data?.user;
+  if (!user) {
+    redirect("/login");
+  }
+
+  return <div>Welcome {user.email}</div>;
+}
 ```
+
+For full session data:
+
+```ts
+import { getSession } from "@/DAL/auth";
+
+const session = await getSession();
+const user = session?.user;
+const sessionData = session?.session;
+```
+
+These utilities:
+
+- ✅ Use `tryCatch` internally for error handling
+- ✅ Return `null` if not authenticated or on error
+- ✅ Automatically handle headers for server-side requests
 
 #### Client Components (Frontend)
 
-```ts
-import { authClient } from "@/auth/auth-client";
+For client components, access session via `authClient`:
 
-const { data } = await authClient.getSession();
-const user = data?.user;
+```ts
+"use client";
+import { authClient } from "@/auth/auth-client";
+import { useEffect, useState } from "react";
+
+export function ClientComponent() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    authClient.getSession().then(({ data }) => {
+      setUser(data?.user);
+    });
+  }, []);
+
+  return <div>{user?.email}</div>;
+}
 ```
+
+**Note**: Prefer server components for authentication checks when possible.
 
 ### RBAC (Role-Based Access Control)
 

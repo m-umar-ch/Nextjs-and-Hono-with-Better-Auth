@@ -11,19 +11,6 @@ import {
 import { adminClient, emailOTPClient } from "better-auth/client/plugins";
 import { env } from "@/env";
 
-/**
- * @Imp
- * In server components, you have to use like this:
- *
- * ```ts
- * const session = await authClient.getSession({
- *   fetchOptions: {
- *     headers: await headers()
- *   },
- * });
- * ```
- */
-
 export const authClient = createAuthClient({
   baseURL: `${env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/better-auth`,
   fetchOptions: { credentials: "include" },

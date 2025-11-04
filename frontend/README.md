@@ -106,20 +106,76 @@ const { data, error, isLoading } = useQuery({
 
 ## 🔐 Using Better Auth
 
-You can easily access the authenticated user or session anywhere in your app using the **Better Auth client**.
+### Server Components
+
+Always use the provided utilities from `@/DAL/auth` for fetching session data in server components. These utilities use `tryCatch` internally for proper error handling.
+
+#### Get User
 
 ```ts
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
+import { getUser } from "@/DAL/auth";
+import { redirect } from "next/navigation";
 
-const { data } = await authClient.getSession({
-  fetchOptions: { headers: await headers() },
-});
+export default async function Page() {
+  const user = await getUser();
 
-const user = data?.user;
+  if (!user) {
+    redirect("/login");
+  }
+
+  return <div>Welcome {user.email}</div>;
+}
 ```
 
-This ensures your session is securely fetched with server-side headers and works seamlessly in both **server** and **client components**.
+#### Get Full Session
+
+```ts
+import { getSession } from "@/DAL/auth";
+
+export default async function Page() {
+  const session = await getSession();
+
+  if (!session?.user) {
+    return <div>Not authenticated</div>;
+  }
+
+  const user = session.user;
+  const sessionData = session.session;
+
+  return <div>Welcome {user.email}</div>;
+}
+```
+
+Both functions:
+
+- ✅ Use `tryCatch` internally for error handling
+- ✅ Return `null` if not authenticated or on error
+- ✅ Automatically handle headers for server-side requests
+- ✅ Follow project error handling patterns
+
+### Client Components
+
+For client components, use TanStack Query with the API client to fetch user data, or access session via `authClient` directly when needed.
+
+```ts
+"use client";
+import { authClient } from "@/auth/auth-client";
+import { useEffect, useState } from "react";
+
+export function ClientComponent() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    authClient.getSession().then(({ data }) => {
+      setUser(data?.user);
+    });
+  }, []);
+
+  return <div>{user?.email}</div>;
+}
+```
+
+**Note**: Prefer server components for authentication checks when possible.
 
 ---
 

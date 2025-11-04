@@ -1,15 +1,10 @@
-import { authClient } from "@/auth/auth-client";
 import SignOutButton from "@/components/common/sign-out-button";
 import { Button } from "@/components/ui/button";
-import { headers } from "next/headers";
+import { getUser } from "@/DAL/auth";
 import Link from "next/link";
 
 export default async function HomePage() {
-  const { data } = await authClient.getSession({
-    fetchOptions: { headers: await headers() },
-  });
-
-  const user = data?.user;
+  const user = await getUser();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background text-center px-4">

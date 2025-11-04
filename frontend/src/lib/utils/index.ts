@@ -26,5 +26,6 @@ export {
   parallelLimit,
   isSuccess,
   isFailure,
+  isConnectionError,
   type Result,
 } from "./async-utils";

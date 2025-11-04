@@ -26,6 +26,7 @@ export {
   parallelLimit,
   isSuccess,
   isFailure,
+  isConnectionError,
   type Result,
 } from "./async-utils";
 
@@ -61,6 +62,7 @@ export type { HTTPStatusKey, HTTPStatusValue } from "./response-utils";
  * - retry: Retry with exponential backoff
  * - parallelLimit: Execute promises with concurrency limit
  * - isSuccess/isFailure: Result type guards
+ * - isConnectionError: Check if error is a connection/network error
  *
  * RESPONSE UTILITIES:
  * - HONO_ERROR: Create standardized error responses

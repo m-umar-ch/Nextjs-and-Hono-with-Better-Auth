@@ -1,3 +1,4 @@
+"use client";
 import { cn } from "@/lib/utils/index";
 import {
   Card,
@@ -13,24 +14,21 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import EmailLoginForm from "./email-login-form";
-import { AuthPageType } from "../types";
 import SingInWithGoogle from "./SignInWithGoogle";
-import AuthorizeForm from "./authorize-form";
+import { useState } from "react";
 
-export function AuthCard({
-  className,
-  type,
-  ...props
-}: React.ComponentProps<"div"> & AuthPageType) {
+export function AuthCard({ className, ...props }: React.ComponentProps<"div">) {
+  const [isOTPView, setIsOTPView] = useState<string | null>(null);
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
-            {type === "login" ? "Welcome back" : "Check You Email for OTP"}
+            {!isOTPView ? "Welcome back" : "Check You Email for OTP"}
           </CardTitle>
           <CardDescription>
-            {type === "login"
+            {!isOTPView
               ? "Login with your Google account"
               : "Or Continue With Google"}
           </CardDescription>
@@ -42,11 +40,11 @@ export function AuthCard({
               <SingInWithGoogle />
             </Field>
             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-              {type === "login" ? "Or continue with" : "Enter OTP"}
+              {!isOTPView ? "Or continue with" : "Enter OTP"}
             </FieldSeparator>
 
             {/* form */}
-            {type === "login" ? <EmailLoginForm /> : <AuthorizeForm />}
+            <EmailLoginForm isOTPView={isOTPView} setIsOTPView={setIsOTPView} />
           </FieldGroup>
         </CardContent>
       </Card>

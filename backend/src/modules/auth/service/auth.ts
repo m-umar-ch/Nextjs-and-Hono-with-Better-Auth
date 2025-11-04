@@ -114,16 +114,18 @@ export const auth = betterAuth({
             clientId: env.GOOGLE_CLIENT_ID,
             clientSecret: env.GOOGLE_CLIENT_SECRET,
             prompt: "select_account",
-            // redirectURI: `${env.FRONTEND_BASE_URL}/api/better-auth/callback/google`,
+            redirectURI: `${env.BACKEND_BASE_URL}/api/better-auth/callback/google`,
           },
         }
       : {},
 
   // Session configuration
-  // session: {
-  //   expiresIn: 60 * 60 * 24 * 7, // 7 days
-  //   updateAge: 60 * 60 * 24, // 1 day
-  // },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache duration in seconds
+    },
+  },
 
   // Advanced configuration
   advanced: {

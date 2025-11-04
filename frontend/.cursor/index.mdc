@@ -100,6 +100,8 @@ src/
 │   └── ui/                  # shadcn/ui components
 ├── DAL/                      # Data Access Layer
 │   ├── api-types.d.ts       # Auto-generated OpenAPI types
+│   ├── auth/                # Authentication utilities
+│   │   └── index.ts         # getSession() and getUser() utilities
 │   └── utils/               # API client utilities
 │       ├── client.ts        # Client-side API client
 │       └── server.ts        # Server-side API client
@@ -115,20 +117,18 @@ src/
 ### Server Component Template
 
 ```typescript
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
+import { getUser } from "@/DAL/auth";
 import { tryCatch } from "@/lib/utils";
 import { api } from "@/DAL/utils/server";
+import { redirect } from "next/navigation";
 
 export default async function ServerComponent() {
-  // Fetch session with error handling
-  const sessionResult = await tryCatch(
-    authClient.getSession({
-      fetchOptions: { headers: await headers() },
-    })
-  );
+  // Fetch user with error handling (utilities handle tryCatch internally)
+  const user = await getUser();
 
-  const user = sessionResult.success ? sessionResult.data?.data?.user : null;
+  if (!user) {
+    redirect("/login");
+  }
 
   // Fetch data with error handling
   const { data: response, error } = await tryCatch(

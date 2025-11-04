@@ -26,8 +26,42 @@ type Failure<E> = {
 export type Result<T, E = Error> = Success<T> | Failure<E>;
 
 /**
+ * Check if an error is a connection/network error
+ * Useful for determining if a fetch or network request failed due to connectivity issues
+ *
+ * @param error - The error to check
+ * @returns True if the error is a connection/network error
+ *
+ * @example
+ * ```ts
+ * const result = await tryCatch(fetch('/api/data'));
+ * if (!result.success && isConnectionError(result.error)) {
+ *   console.error('Backend server unavailable');
+ * }
+ * ```
+ */
+export function isConnectionError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    const cause = (error as any)?.cause;
+
+    return (
+      message.includes("fetch failed") ||
+      message.includes("socket") ||
+      message.includes("connection") ||
+      message.includes("network") ||
+      message.includes("econnrefused") ||
+      cause?.code === "UND_ERR_SOCKET" ||
+      cause?.code === "ECONNREFUSED"
+    );
+  }
+  return false;
+}
+
+/**
  * Wraps a promise in a try-catch and returns a Result type instead of throwing.
  * This follows the Result pattern for better error handling without try-catch blocks.
+ * Automatically logs helpful messages for connection errors in development mode.
  *
  * @param promise - The promise to execute safely
  * @returns Promise that resolves to either Success or Failure result
@@ -47,6 +81,14 @@ export async function tryCatch<T, E = Error>(
     const data = await promise;
     return { data, error: null, success: true };
   } catch (error) {
+    // Log helpful connection error messages in development
+    if (process.env.NODE_ENV === "development" && isConnectionError(error)) {
+      console.error(
+        "⚠️  Connection error detected. This may indicate a service is unavailable."
+      );
+      console.error("Error details:", error);
+    }
+
     return { data: null, error: error as E, success: false };
   }
 }

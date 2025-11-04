@@ -1,15 +1,13 @@
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import AuthPage from "../_components/auth-page";
+import AuthPageSkeleton from "../_components/page-skeleton";
 
-const page = async () => {
-  const { data } = await authClient.getSession({
-    fetchOptions: { headers: await headers() },
-  });
-  if (data && data.session && data.user) redirect("/");
-
-  return <AuthPage type="login" />;
+const page = () => {
+  return (
+    <Suspense fallback={<AuthPageSkeleton />}>
+      <AuthPage />
+    </Suspense>
+  );
 };
 
 export default page;

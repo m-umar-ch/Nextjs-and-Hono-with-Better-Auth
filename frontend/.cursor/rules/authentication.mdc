@@ -2,64 +2,57 @@
 
 ## Overview
 
-Always fetch sessions in server components using `authClient.getSession()`. Never use the `useSession` hook. You can wrap session fetching in `tryCatch` for better error handling.
+Always use the provided authentication utilities from `@/DAL/auth` in server components. These utilities use `tryCatch` internally for proper error handling. Never use the `useSession` hook from Better Auth.
 
-## Import Statement
+## Import Statements
 
 ```typescript
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
-import { tryCatch } from "@/lib/utils";
+// ✅ CORRECT: Use provided utilities
+import { getUser, getSession } from "@/DAL/auth";
+
+// ❌ INCORRECT: Don't import authClient directly in server components
+import { authClient } from "@/auth/auth-client"; // DON'T DO THIS
 ```
 
 ## Server Components
 
-### Basic Pattern
+### Get User (Most Common)
 
-Always fetch session in server components:
+Use `getUser()` when you only need the user object:
 
 ```typescript
-// ✅ CORRECT: Fetching session in server component
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
+// ✅ CORRECT: Using getUser utility
+import { getUser } from "@/DAL/auth";
+import { redirect } from "next/navigation";
 
 export default async function ServerComponent() {
-  const { data } = await authClient.getSession({
-    fetchOptions: { headers: await headers() },
-  });
+  const user = await getUser();
 
-  const user = data?.user;
+  if (!user) {
+    redirect("/login");
+  }
 
-  return <div>Welcome {user?.email}</div>;
+  return <div>Welcome {user.email}</div>;
 }
 ```
 
-### With Error Handling
+### Get Full Session
 
-Wrap session fetching in `tryCatch` for safer error handling:
+Use `getSession()` when you need both user and session data:
 
 ```typescript
-// ✅ CORRECT: With error handling
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
-import { tryCatch } from "@/lib/utils";
+// ✅ CORRECT: Using getSession utility
+import { getSession } from "@/DAL/auth";
 
 export default async function ServerComponent() {
-  const sessionResult = await tryCatch(
-    authClient.getSession({
-      fetchOptions: { headers: await headers() },
-    })
-  );
+  const session = await getSession();
 
-  if (!sessionResult.success) {
-    return <div>Authentication error</div>;
-  }
-
-  const user = sessionResult.data?.data?.user;
-
-  if (!user) {
+  if (!session?.user) {
     return <div>Not authenticated</div>;
   }
+
+  const user = session.user;
+  const sessionData = session.session;
 
   return <div>Welcome {user.email}</div>;
 }
@@ -67,26 +60,20 @@ export default async function ServerComponent() {
 
 ### Protected Routes
 
-For protected routes, redirect if not authenticated:
+For protected routes, use `getUser()` and redirect if not authenticated:
 
 ```typescript
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
+// ✅ CORRECT: Protected route pattern
+import { getUser } from "@/DAL/auth";
 import { redirect } from "next/navigation";
-import { tryCatch } from "@/lib/utils";
 
 export default async function ProtectedPage() {
-  const sessionResult = await tryCatch(
-    authClient.getSession({
-      fetchOptions: { headers: await headers() },
-    })
-  );
+  const user = await getUser();
 
-  if (!sessionResult.success || !sessionResult.data?.data?.user) {
+  if (!user) {
     redirect("/login");
   }
 
-  const user = sessionResult.data.data.user;
   return <div>Protected content for {user.email}</div>;
 }
 ```
@@ -132,17 +119,18 @@ export function Component() {
 
 ### DO
 
-- ✅ Always fetch session in server components using `authClient.getSession()`
-- ✅ Always pass `{ fetchOptions: { headers: await headers() } }` in server components
-- ✅ Wrap session fetching in `tryCatch` for error handling
-- ✅ Check if user exists before accessing user properties
+- ✅ Always use `getUser()` or `getSession()` from `@/DAL/auth` in server components
+- ✅ Check if user/session exists before accessing properties
 - ✅ Redirect to login page if authentication fails
 - ✅ Use server components for authentication checks when possible
+- ✅ Use `getUser()` when you only need the user object
+- ✅ Use `getSession()` when you need both user and session data
 
 ### DON'T
 
-- ❌ Never use `useSession` hook
-- ❌ Don't forget to pass headers in server components
+- ❌ Never use `useSession` hook from Better Auth
+- ❌ Don't use `authClient.getSession()` directly in server components (use utilities instead)
+- ❌ Don't manually wrap `authClient.getSession()` with `tryCatch` (utilities handle this)
 - ❌ Don't access user properties without checking if user exists
 - ❌ Don't perform authentication checks in client components unnecessarily
 
@@ -151,19 +139,12 @@ export function Component() {
 ### Page with User Info
 
 ```typescript
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
-import { tryCatch } from "@/lib/utils";
+// ✅ CORRECT: Using getUser utility
+import { getUser } from "@/DAL/auth";
 import SignOutButton from "@/components/common/sign-out-button";
 
 export default async function HomePage() {
-  const sessionResult = await tryCatch(
-    authClient.getSession({
-      fetchOptions: { headers: await headers() },
-    })
-  );
-
-  const user = sessionResult.success ? sessionResult.data?.data?.user : null;
+  const user = await getUser();
 
   return (
     <main>
@@ -174,27 +155,21 @@ export default async function HomePage() {
 }
 ```
 
-### Layout with Authentication
+### Protected Layout
 
 ```typescript
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
-import { tryCatch } from "@/lib/utils";
+// ✅ CORRECT: Protected layout pattern
+import { getUser } from "@/DAL/auth";
 import { redirect } from "next/navigation";
 
-export default async function Layout({
+export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const sessionResult = await tryCatch(
-    authClient.getSession({
-      fetchOptions: { headers: await headers() },
-    })
-  );
+  const user = await getUser();
 
-  // Redirect to login if not authenticated
-  if (!sessionResult.success || !sessionResult.data?.data?.user) {
+  if (!user) {
     redirect("/login");
   }
 
@@ -205,19 +180,13 @@ export default async function Layout({
 ### Conditional Rendering Based on Auth
 
 ```typescript
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
-import { tryCatch } from "@/lib/utils";
+// ✅ CORRECT: Conditional rendering
+import { getUser } from "@/DAL/auth";
 import Link from "next/link";
+import SignOutButton from "@/components/common/sign-out-button";
 
 export default async function Navigation() {
-  const sessionResult = await tryCatch(
-    authClient.getSession({
-      fetchOptions: { headers: await headers() },
-    })
-  );
-
-  const user = sessionResult.success ? sessionResult.data?.data?.user : null;
+  const user = await getUser();
 
   return (
     <nav>
@@ -234,47 +203,59 @@ export default async function Navigation() {
 }
 ```
 
-## Type Safety
-
-The session result structure:
+### Getting Full Session Data
 
 ```typescript
-// Without tryCatch
-const { data } = await authClient.getSession({...});
-// data?.user is the user object
+// ✅ CORRECT: When you need both user and session
+import { getSession } from "@/DAL/auth";
 
-// With tryCatch
-const sessionResult = await tryCatch(authClient.getSession({...}));
-// sessionResult.data?.data?.user is the user object
+export default async function Page() {
+  const session = await getSession();
+
+  if (!session?.user) {
+    return <div>Not authenticated</div>;
+  }
+
+  // Access both user and session data
+  const user = session.user;
+  const sessionData = session.session;
+  const expiresAt = sessionData?.expiresAt;
+
+  return (
+    <div>
+      <p>User: {user.email}</p>
+      <p>Session expires: {expiresAt?.toLocaleString()}</p>
+    </div>
+  );
+}
+```
+
+## Type Safety
+
+The utility functions return types:
+
+```typescript
+// getUser() returns User | null
+const user = await getUser();
+// user is User | null
+
+// getSession() returns { user: User | null, session: Session | null } | null
+const session = await getSession();
+// session?.user is User | null
+// session?.session is Session | null
 ```
 
 ## Error Handling
 
-Always handle authentication errors gracefully:
+The utilities handle errors internally and return `null` on failure:
 
 ```typescript
-import { authClient } from "@/auth/auth-client";
-import { headers } from "next/headers";
-import { tryCatch } from "@/lib/utils";
+import { getUser } from "@/DAL/auth";
 
 export default async function Component() {
-  const sessionResult = await tryCatch(
-    authClient.getSession({
-      fetchOptions: { headers: await headers() },
-    })
-  );
+  const user = await getUser();
 
-  if (!sessionResult.success) {
-    // Log error for debugging
-    console.error("Session fetch error:", sessionResult.error);
-
-    // Return appropriate UI
-    return <div>Unable to verify authentication. Please try again.</div>;
-  }
-
-  const user = sessionResult.data?.data?.user;
-
-  // Handle unauthenticated state
+  // Handle unauthenticated state (includes error cases)
   if (!user) {
     return <div>Please log in to continue.</div>;
   }
@@ -283,3 +264,10 @@ export default async function Component() {
   return <div>Welcome {user.email}</div>;
 }
 ```
+
+The utilities automatically:
+
+- ✅ Use `tryCatch` internally
+- ✅ Handle headers for server-side requests
+- ✅ Return `null` on error or unauthenticated state
+- ✅ Log errors to console for debugging
