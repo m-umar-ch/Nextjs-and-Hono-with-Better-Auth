@@ -4,6 +4,7 @@ import { HTTP } from "@/lib/http/status-codes";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_RESPONSE, HONO_ERROR } from "@/lib/utils";
 import { AppRouteHandler } from "@/lib/core/create-router";
+import { sendEmail } from "../service/mailer.service";
 
 /**
  * @info Zod schema for sendEmail API input validation
@@ -74,12 +75,6 @@ export const POST_Route = createRoute({
 export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
   try {
     const emailData = c.req.valid("json");
-
-    /**
-     * @Info Import sendEmail from the service
-     * @Reason code splitting and boost application startup
-     */
-    const { sendEmail } = await import("../service/mailer.service");
 
     // Send the email using the validated data
     const result = await sendEmail(emailData);

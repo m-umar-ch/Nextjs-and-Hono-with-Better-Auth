@@ -1,6 +1,27 @@
 import z from "zod";
 import { HTTP } from "../http/status-codes";
 
+export function createOKSchema<T>({
+  description = "OK - Request successful",
+  data,
+}: {
+  description?: string;
+  data: T;
+}) {
+  return {
+    description,
+    content: {
+      "application/json": {
+        schema: z.object({
+          success: z.boolean().default(true),
+          message: z.string().default("Operation completed successfully"),
+          statusCode: z.number().optional().default(HTTP.OK),
+          data,
+        }),
+      },
+    },
+  };
+}
 /**
  * Collection of standardized OpenAPI response schemas for HTTP status codes.
  *
@@ -83,6 +104,89 @@ export const APISchema = {
    */
   NO_CONTENT: {
     description: "No Content - Request successful with no response body",
+  },
+
+  /**
+   * HTTP 200 OK - Image file response schema.
+   *
+   * Used for successful image file retrieval endpoints.
+   * Returns binary image data with appropriate content type headers.
+   * Supports multiple image formats: PNG, JPEG, GIF, WebP, SVG, ICO, BMP, and AVIF.
+   *
+   * @example
+   * // Response headers:
+   * // Content-Type: image/png
+   * // Cache-Control: public, max-age=31536000, immutable
+   * // Content-Length: 12345
+   * // Binary image data in response body
+   */
+  IMAGE_OK: {
+    description: "OK - Image file returned successfully",
+    content: {
+      "image/png": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+      "image/jpeg": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+      "image/gif": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+      "image/webp": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+      "image/svg+xml": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+      "image/x-icon": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+      "image/bmp": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+      "image/avif": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+      "application/octet-stream": {
+        schema: z.string().openapi({
+          type: "string",
+          format: "binary",
+          description: "Raw file data",
+        }),
+      },
+    },
   },
 
   /**

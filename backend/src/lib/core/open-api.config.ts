@@ -13,11 +13,11 @@ export default function configureOpenAPI(app: AppOpenAPI) {
       description:
         "E-commerce backend API with authentication and user management",
     },
-    servers: [
-      { url: "/api/better-auth/open-api/generate-schema" },
-      // Better Auth schema generation endpoint
-      { url: "/api/doc" },
-    ],
+    // servers: [
+    //   { url: "/api/better-auth/open-api/generate-schema" },
+    //   // Better Auth schema generation endpoint
+    //   { url: "/api/doc" },
+    // ],
   });
 
   app.get(

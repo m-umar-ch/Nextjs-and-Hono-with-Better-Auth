@@ -22,6 +22,9 @@ import { mailerController } from "./modules/mailer/controller/mailer.controller"
 import { auth } from "./modules/auth/service/auth";
 import { authMiddleware } from "./lib/middlewares/auth.middleware";
 import { Auth_CORS_Middleware } from "./lib/middlewares/cors.middleware";
+import { categoryController } from "./modules/category/controller/category.controller";
+import { fileController } from "./modules/file/controller/file.controller";
+import { serveStatic } from "hono/bun";
 
 const createApp = () => {
   const app = createRouter().basePath("/api");
@@ -64,7 +67,6 @@ app.openapi(
       [HTTP.UNAUTHORIZED]: APISchema.UNAUTHORIZED,
       [HTTP.UNPROCESSABLE_ENTITY]: APISchema.UNPROCESSABLE_ENTITY,
     },
-    middleware: [],
   },
   (c) => {
     if (!c.var.session) {
@@ -75,7 +77,52 @@ app.openapi(
   }
 );
 
-const controllers = [mailerController] as const;
+// app.openapi(
+//   {
+//     path: "/static",
+//     method: "get",
+//     tags: ["Base"],
+//     responses: {
+//       [HTTP.NO_CONTENT]: APISchema.NO_CONTENT,
+//       // [HTTP.UNAUTHORIZED]: APISchema.UNAUTHORIZED,
+//       // [HTTP.UNPROCESSABLE_ENTITY]: APISchema.UNPROCESSABLE_ENTITY,
+//     },
+//   },
+//   serveStatic({
+//     onNotFound: (path, c) => {
+//       console.log(`${path} is not found, you access ${c.req.path}`);
+//     },
+//     onFound(path, c) {
+//       console.log(`${path} is found, you access ${c.req.path}`);
+//     },
+//     path: "./public/image/m_umar_ch.png",
+//   })
+//   // return c.json(HONO_RESPONSE({ message: "Yollo Bozo" }), HTTP.OK);
+// );
+
+// app.get(
+//   "/static",
+//   serveStatic({
+//     onNotFound: (path, c) => {
+//       console.log(`${path} is not found, you access ${c.req.path}`);
+//     },
+//     onFound(path, c) {
+//       console.log(`${path} is found, you access ${c.req.path}`);
+//     },
+//     path: "./public/image/m_umar_ch.png",
+//   })
+// );
+
+// app.use("/img", (c) => {
+//   serveStatic({ path: "./public/image/m_umar_ch.png" });
+//   return c.json({}, 200);
+// });
+
+const controllers = [
+  mailerController,
+  categoryController,
+  fileController,
+] as const;
 
 for (const controller of controllers) {
   app.route("/", controller);
