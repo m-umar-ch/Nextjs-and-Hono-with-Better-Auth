@@ -18,4 +18,3 @@ export const PATCH_Route = createRoute({
 export const PATCH_Handler: AppRouteHandler<typeof PATCH_Route> = async (c) => {
   return c.json(HONO_RESPONSE(), HTTP.OK);
 };
-

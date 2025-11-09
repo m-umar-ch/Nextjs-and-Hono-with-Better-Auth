@@ -20,7 +20,7 @@ export function createResponseSchema<T>({
             .string()
             .default(
               HTTP_STATUS_PHRASE[HTTP[statusCode]] ||
-                "Operation completed successfully"
+                "Operation completed successfully",
             ),
           statusCode: z.number().optional().default(HTTP[statusCode]),
           data,
@@ -225,7 +225,7 @@ export const APISchema = {
                   message: z.string(),
                   path: z.string().optional(),
                   code: z.string().optional(),
-                })
+                }),
               )
               .optional(),
           }),
@@ -264,7 +264,7 @@ export const APISchema = {
                   message: z.string(),
                   path: z.string().optional(),
                   code: z.string().optional(),
-                })
+                }),
               )
               .optional(),
           }),
@@ -303,7 +303,7 @@ export const APISchema = {
                   message: z.string(),
                   path: z.string().optional(),
                   code: z.string().optional(),
-                })
+                }),
               )
               .optional(),
           }),
@@ -342,7 +342,7 @@ export const APISchema = {
                   message: z.string(),
                   path: z.string().optional(),
                   code: z.string().optional(),
-                })
+                }),
               )
               .optional(),
           }),
@@ -381,7 +381,7 @@ export const APISchema = {
                   message: z.string(),
                   path: z.string().optional(),
                   code: z.string().optional(),
-                })
+                }),
               )
               .optional(),
           }),
@@ -420,7 +420,7 @@ export const APISchema = {
                   message: z.string(),
                   path: z.string().optional(),
                   code: z.string().optional(),
-                })
+                }),
               )
               .optional(),
           }),
@@ -460,7 +460,7 @@ export const APISchema = {
                   message: z.string(),
                   path: z.string().optional(),
                   code: z.string().optional(),
-                })
+                }),
               )
               .optional(),
           }),
@@ -499,7 +499,7 @@ export const CommonSchemas = {
             message: z.string(),
             path: z.string().optional(),
             code: z.string().optional(),
-          })
+          }),
         )
         .optional(),
     }),

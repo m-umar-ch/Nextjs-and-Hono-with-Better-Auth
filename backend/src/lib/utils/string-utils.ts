@@ -28,7 +28,7 @@
  */
 export const slugify = (
   str: string,
-  options: { maxLength?: number; separator?: string } = {}
+  options: { maxLength?: number; separator?: string } = {},
 ): string => {
   if (!str || typeof str !== "string") {
     return "";
@@ -85,7 +85,7 @@ export const slugify = (
  */
 export const deSlugify = (
   slug: string,
-  options: { separator?: string; titleCase?: boolean } = {}
+  options: { separator?: string; titleCase?: boolean } = {},
 ): string => {
   if (!slug || typeof slug !== "string") {
     return "";
@@ -144,7 +144,7 @@ export const capitalize = (str: string): string => {
  */
 export const toTitleCase = (
   str: string,
-  options: { excludeWords?: string[] } = {}
+  options: { excludeWords?: string[] } = {},
 ): string => {
   if (!str || typeof str !== "string") {
     return "";
@@ -182,7 +182,7 @@ export const toTitleCase = (
 export const truncate = (
   str: string,
   maxLength: number,
-  ellipsis: string = "..."
+  ellipsis: string = "...",
 ): string => {
   if (!str || typeof str !== "string") {
     return "";

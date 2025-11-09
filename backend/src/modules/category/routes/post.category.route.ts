@@ -52,7 +52,7 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
   if (alreadyExists) {
     return c.json(
       HONO_ERROR("UNPROCESSABLE_ENTITY", "Image Slug already exists"),
-      HTTP.UNPROCESSABLE_ENTITY
+      HTTP.UNPROCESSABLE_ENTITY,
     );
   }
 
@@ -62,9 +62,9 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
     return c.json(
       HONO_ERROR(
         "INTERNAL_SERVER_ERROR",
-        `Failed to upload image: ${imageResponse.error.message}`
+        `Failed to upload image: ${imageResponse.error.message}`,
       ),
-      HTTP.INTERNAL_SERVER_ERROR
+      HTTP.INTERNAL_SERVER_ERROR,
     );
   }
 
@@ -93,18 +93,18 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
       if (deleteResult.error) {
         HONO_LOGGER.error(
           `Failed to clean up image ${imageResponse.data.slug}:`,
-          deleteResult.error
+          deleteResult.error,
         );
       }
     }
     return c.json(
       HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to create category record."),
-      HTTP.INTERNAL_SERVER_ERROR
+      HTTP.INTERNAL_SERVER_ERROR,
     );
   }
 
   return c.json(
     HONO_RESPONSE({ data: categoryResponse, statusCode: "CREATED" }),
-    HTTP.CREATED
+    HTTP.CREATED,
   );
 };

@@ -37,6 +37,6 @@ export const onError: ErrorHandler = (err, c) => {
 
       stack: curr_env === "production" ? undefined : err.stack,
     },
-    statusCode as ContentfulStatusCode
+    statusCode as ContentfulStatusCode,
   );
 };

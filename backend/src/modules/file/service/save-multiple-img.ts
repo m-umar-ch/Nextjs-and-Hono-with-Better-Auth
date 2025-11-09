@@ -39,7 +39,7 @@ export async function saveMultipleImages(
     img: File;
     customImgSlug?: string;
     sortOrder?: number;
-  }[]
+  }[],
 ) {
   // Process all images in parallel
   const results = await Promise.all(
@@ -69,7 +69,7 @@ export async function saveMultipleImages(
         success: false,
         sortOrder: sortOrder,
       } as const;
-    })
+    }),
   );
 
   return results;

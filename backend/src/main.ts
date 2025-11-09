@@ -74,7 +74,7 @@ app.openapi(
     }
 
     return c.json(HONO_RESPONSE({ message: "Yollo Bozo" }), HTTP.OK);
-  }
+  },
 );
 
 // app.openapi(
@@ -136,7 +136,7 @@ serve({
 
 HonoLogger(`🚀 Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
 HonoLogger(
-  `📚 Scalar API documentation available at: http://localhost:${env.PORT}/api/reference`
+  `📚 Scalar API documentation available at: http://localhost:${env.PORT}/api/reference`,
 );
 
 // export type AppType = (typeof controllers)[number];

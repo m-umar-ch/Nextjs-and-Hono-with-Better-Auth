@@ -15,7 +15,8 @@ export const DELETE_Route = createRoute({
   },
 });
 
-export const DELETE_Handler: AppRouteHandler<typeof DELETE_Route> = async (c) => {
+export const DELETE_Handler: AppRouteHandler<typeof DELETE_Route> = async (
+  c,
+) => {
   return c.json(HONO_RESPONSE(), HTTP.OK);
 };
-

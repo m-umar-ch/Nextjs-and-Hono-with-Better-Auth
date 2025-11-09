@@ -28,7 +28,7 @@ export const GET_IMG_Route = createRoute({
 });
 
 export const GET_IMG_Handler: AppRouteHandler<typeof GET_IMG_Route> = async (
-  c
+  c,
 ) => {
   const { slug } = c.req.valid("param");
 
@@ -37,7 +37,7 @@ export const GET_IMG_Handler: AppRouteHandler<typeof GET_IMG_Route> = async (
   if (!filePath) {
     return c.json(
       HONO_ERROR("BAD_REQUEST", "Invalid file path"),
-      HTTP.BAD_REQUEST
+      HTTP.BAD_REQUEST,
     );
   }
 

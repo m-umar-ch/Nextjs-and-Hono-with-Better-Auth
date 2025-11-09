@@ -28,7 +28,7 @@ export interface RouterConfig {
  * Provides standardized error responses with detailed validation information
  */
 const createDefaultHook = (
-  includeErrorDetails = true
+  includeErrorDetails = true,
 ): Hook<any, any, any, any> => {
   return (result, c: Context) => {
     if (!result.success) {
@@ -50,7 +50,7 @@ const createDefaultHook = (
           issues: issues.length > 0 ? issues : undefined,
           requestId,
           timestamp: true,
-        }
+        },
       );
 
       return c.json(errorResponse, UNPROCESSABLE_ENTITY);

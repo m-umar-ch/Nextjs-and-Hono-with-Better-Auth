@@ -36,21 +36,71 @@ import { defaultStatements } from "better-auth/plugins/admin/access";
  */
 const statement = {
   ...defaultStatements,
-  user: [ "create", "read", "update", "delete", "list", "ban", "unban", "change_role"],
+  user: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "ban",
+    "unban",
+    "change_role",
+  ],
 
-  product: ["create", "read", "update", "delete", "list", "publish", "unpublish", "manage_inventory"],
+  product: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "publish",
+    "unpublish",
+    "manage_inventory",
+  ],
 
-  order: ["create", "read", "update", "delete", "list", "cancel", "fulfill", "refund", "track"],
+  order: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "cancel",
+    "fulfill",
+    "refund",
+    "track",
+  ],
 
   category: ["create", "read", "update", "delete", "list", "reorder"],
 
-  content: ["create", "read", "update", "delete", "list", "publish", "unpublish"],
+  content: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "publish",
+    "unpublish",
+  ],
 
   blog: ["create", "read", "update", "delete", "list", "publish", "unpublish"],
 
-  discount: ["create", "read", "update", "delete", "list", "activate", "deactivate"],
+  discount: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "activate",
+    "deactivate",
+  ],
 
-  analytics: ["view_sales", "view_traffic", "view_customers", "view_products", "export_reports"],
+  analytics: [
+    "view_sales",
+    "view_traffic",
+    "view_customers",
+    "view_products",
+    "export_reports",
+  ],
 
   // system: ["configure", "backup", "restore", "maintenance", "view_logs"],
 
@@ -75,14 +125,64 @@ const ac = createAccessControl(statement);
  * Can perform all actions across all resources
  */
 const superAdmin = ac.newRole({
-  user: ["create", "read", "update", "delete", "list", "ban", "unban", "change_role"],
-  product: ["create", "read", "update", "delete", "list", "publish", "unpublish", "manage_inventory"],
-  order: ["create", "read", "update", "delete", "list", "cancel", "fulfill", "refund", "track"],
+  user: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "ban",
+    "unban",
+    "change_role",
+  ],
+  product: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "publish",
+    "unpublish",
+    "manage_inventory",
+  ],
+  order: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "cancel",
+    "fulfill",
+    "refund",
+    "track",
+  ],
   category: ["create", "read", "update", "delete", "list", "reorder"],
-  content: ["create", "read", "update", "delete", "list", "publish", "unpublish"],
+  content: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "publish",
+    "unpublish",
+  ],
   blog: ["create", "read", "update", "delete", "list", "publish", "unpublish"],
-  discount: ["create", "read", "update", "delete", "list", "activate", "deactivate"],
-  analytics: ["view_sales", "view_traffic", "view_customers", "view_products", "export_reports"],
+  discount: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "activate",
+    "deactivate",
+  ],
+  analytics: [
+    "view_sales",
+    "view_traffic",
+    "view_customers",
+    "view_products",
+    "export_reports",
+  ],
   review: ["create", "read", "update", "delete", "moderate", "respond"],
   coupon: ["create", "read", "update", "delete", "list", "validate"],
   inventory: ["view", "update", "track", "alert", "transfer"],
@@ -97,13 +197,44 @@ const superAdmin = ac.newRole({
  */
 const admin = ac.newRole({
   user: ["create", "read", "update", "delete", "list", "ban", "unban"],
-  product: ["create", "read", "update", "delete", "list", "publish", "unpublish", "manage_inventory"],
+  product: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "publish",
+    "unpublish",
+    "manage_inventory",
+  ],
   order: ["read", "update", "list", "cancel", "fulfill", "refund", "track"],
   category: ["create", "read", "update", "delete", "list", "reorder"],
-  content: ["create", "read", "update", "delete", "list", "publish", "unpublish"],
+  content: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "publish",
+    "unpublish",
+  ],
   blog: ["create", "read", "update", "delete", "list", "publish", "unpublish"],
-  discount: ["create", "read", "update", "delete", "list", "activate", "deactivate"],
-  analytics: ["view_sales", "view_traffic", "view_customers", "view_products", "export_reports"],
+  discount: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "activate",
+    "deactivate",
+  ],
+  analytics: [
+    "view_sales",
+    "view_traffic",
+    "view_customers",
+    "view_products",
+    "export_reports",
+  ],
   review: ["read", "moderate", "respond"],
   coupon: ["create", "read", "update", "delete", "list", "validate"],
   inventory: ["view", "update", "track", "alert", "transfer"],
@@ -118,7 +249,15 @@ const admin = ac.newRole({
  */
 const vendor = ac.newRole({
   user: ["read"], // Can only read their own profile
-  product: ["create", "read", "update", "list", "publish", "unpublish", "manage_inventory"], // Own products only
+  product: [
+    "create",
+    "read",
+    "update",
+    "list",
+    "publish",
+    "unpublish",
+    "manage_inventory",
+  ], // Own products only
   order: ["read", "update", "list", "fulfill", "track"], // Own orders only
   category: ["read", "list"], // Read-only access to categories
   content: [], // No content permissions
@@ -143,8 +282,22 @@ const salesManager = ac.newRole({
   category: ["read", "list"], // Read-only access to categories
   content: [], // No content permissions
   blog: [], // No blog permissions
-  discount: ["create", "read", "update", "delete", "list", "activate", "deactivate"], // Full discount management
-  analytics: ["view_sales", "view_traffic", "view_customers", "view_products", "export_reports"], // Full analytics
+  discount: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "activate",
+    "deactivate",
+  ], // Full discount management
+  analytics: [
+    "view_sales",
+    "view_traffic",
+    "view_customers",
+    "view_products",
+    "export_reports",
+  ], // Full analytics
   review: ["read", "moderate"], // Can moderate reviews
   coupon: ["create", "read", "update", "delete", "list", "validate"], // Full coupon management
   inventory: ["view", "track"], // Inventory visibility
@@ -161,7 +314,15 @@ const contentEditor = ac.newRole({
   product: ["read", "update", "list"], // Can edit product descriptions
   order: [], // No order permissions
   category: ["create", "read", "update", "list", "reorder"], // Category management
-  content: ["create", "read", "update", "delete", "list", "publish", "unpublish"], // Full content management
+  content: [
+    "create",
+    "read",
+    "update",
+    "delete",
+    "list",
+    "publish",
+    "unpublish",
+  ], // Full content management
   blog: ["create", "read", "update", "delete", "list", "publish", "unpublish"], // Full blog management
   discount: [], // No discount permissions
   analytics: [], // No analytics permissions

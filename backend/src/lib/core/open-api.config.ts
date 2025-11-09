@@ -55,6 +55,6 @@ export default function configureOpenAPI(app: AppOpenAPI) {
       //   { url: "/api/doc", title: "Api", },
       //   { url: "/api/better-auth/reference", title: "Auth" }
       // ]
-    })
+    }),
   );
 }

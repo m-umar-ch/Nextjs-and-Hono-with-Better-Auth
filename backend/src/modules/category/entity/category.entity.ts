@@ -31,7 +31,7 @@ export const category = createTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [uniqueIndex("category_slug_idx").on(table.slug)]
+  (table) => [uniqueIndex("category_slug_idx").on(table.slug)],
 );
 
 export const categoryRelations = relations(category, ({ many, one }) => ({

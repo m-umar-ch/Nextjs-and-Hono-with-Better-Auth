@@ -43,4 +43,3 @@ export async function deleteImage(imageSlug: string) {
     success: true,
   } as const;
 }
-

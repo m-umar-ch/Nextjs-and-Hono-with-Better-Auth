@@ -57,7 +57,7 @@ export const sentryErrorHandler = (originalErrorHandler: any) => {
         method: c.req.method,
         url: c.req.url,
         userAgent: c.req.header("user-agent"),
-      }
+      },
     );
 
     // Call the original error handler

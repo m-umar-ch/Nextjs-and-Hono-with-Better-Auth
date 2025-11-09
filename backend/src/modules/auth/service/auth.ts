@@ -58,7 +58,7 @@ export const auth = betterAuth({
             db.query.user.findFirst({
               where: eq(user.email, email),
               columns: { name: true },
-            })
+            }),
           );
           userName = data?.name;
           if (error) {

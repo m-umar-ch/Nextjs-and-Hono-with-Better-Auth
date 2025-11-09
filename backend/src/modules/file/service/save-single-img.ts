@@ -41,7 +41,7 @@ export async function saveSingleImage(img: File, customImgSlug?: string) {
 
   // Ensure images directory exists
   const { error: mkdirError } = await tryCatch(
-    mkdir(imagesDir, { recursive: true })
+    mkdir(imagesDir, { recursive: true }),
   );
   if (mkdirError) {
     return {
@@ -65,7 +65,7 @@ export async function saveSingleImage(img: File, customImgSlug?: string) {
   const { data: existingFile } = await tryCatch(
     db.query.file.findFirst({
       where: eq(file.slug, filename),
-    })
+    }),
   );
 
   if (existingFile) {
@@ -94,7 +94,7 @@ export async function saveSingleImage(img: File, customImgSlug?: string) {
 
     // Insert with new filename
     const { data: fileRecord, error: insertError } = await tryCatch(
-      db.insert(file).values({ slug: newFilename }).returning()
+      db.insert(file).values({ slug: newFilename }).returning(),
     );
 
     if (insertError || !fileRecord?.[0]) {
@@ -116,7 +116,7 @@ export async function saveSingleImage(img: File, customImgSlug?: string) {
 
   // Insert file record into database
   const { data: fileRecord, error: insertError } = await tryCatch(
-    db.insert(file).values({ slug: filename }).returning()
+    db.insert(file).values({ slug: filename }).returning(),
   );
 
   if (insertError || !fileRecord?.[0]) {

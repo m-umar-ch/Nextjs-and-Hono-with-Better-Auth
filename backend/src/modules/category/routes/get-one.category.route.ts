@@ -15,7 +15,8 @@ export const GET_ONE_Route = createRoute({
   },
 });
 
-export const GET_ONE_Handler: AppRouteHandler<typeof GET_ONE_Route> = async (c) => {
+export const GET_ONE_Handler: AppRouteHandler<typeof GET_ONE_Route> = async (
+  c,
+) => {
   return c.json(HONO_RESPONSE(), HTTP.OK);
 };
-

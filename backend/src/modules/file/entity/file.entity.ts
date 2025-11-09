@@ -17,7 +17,7 @@ export const file = createTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index().on(table.id)]
+  (table) => [index().on(table.id)],
 );
 
 export const fileRelations = relations(file, ({ many, one }) => ({}));

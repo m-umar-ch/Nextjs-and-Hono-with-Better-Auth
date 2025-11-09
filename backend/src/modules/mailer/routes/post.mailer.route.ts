@@ -84,7 +84,7 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
         HONO_ERROR("BAD_REQUEST", "Failed to send email", {
           issues: [{ message: result.error || "Unknown error occurred" }],
         }),
-        HTTP.BAD_REQUEST
+        HTTP.BAD_REQUEST,
       );
     }
 
@@ -93,7 +93,7 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
         message: "Email sent successfully",
         data: result.data,
       }),
-      HTTP.OK
+      HTTP.OK,
     );
   } catch (error) {
     return c.json(
@@ -106,7 +106,7 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
         ],
         error,
       }),
-      HTTP.INTERNAL_SERVER_ERROR
+      HTTP.INTERNAL_SERVER_ERROR,
     );
   }
 };

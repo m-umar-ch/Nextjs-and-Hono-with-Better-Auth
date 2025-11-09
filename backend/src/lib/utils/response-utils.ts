@@ -93,7 +93,7 @@ interface ErrorOptions {
 export function HONO_ERROR(
   statusCode: HTTPStatusKey,
   message?: string,
-  options: ErrorOptions = {}
+  options: ErrorOptions = {},
 ): ErrorResponse {
   const statusValue = HTTP[statusCode];
 
@@ -179,7 +179,7 @@ export function HONO_ERROR(
             requestId,
             timestamp: new Date().toISOString(),
           },
-        }
+        },
       );
     }
   } else {
@@ -259,17 +259,17 @@ export type SuccessResponseNoData = BaseResponse & { data?: never };
 
 // Overload for when data is provided
 export function HONO_RESPONSE<T>(
-  options: ResponseOptions<T> & { data: T }
+  options: ResponseOptions<T> & { data: T },
 ): SuccessResponse<T>;
 
 // Overload for when no data is provided
 export function HONO_RESPONSE(
-  options?: Omit<ResponseOptions, "data">
+  options?: Omit<ResponseOptions, "data">,
 ): SuccessResponseNoData;
 
 // Implementation
 export function HONO_RESPONSE<T>(
-  options: ResponseOptions<T> = {}
+  options: ResponseOptions<T> = {},
 ): SuccessResponse<T> | SuccessResponseNoData {
   const {
     data,
@@ -319,7 +319,7 @@ export function HONO_PAGINATED_RESPONSE<T>(
     hasNext?: boolean;
     hasPrev?: boolean;
   },
-  options: Omit<ResponseOptions, "data"> = {}
+  options: Omit<ResponseOptions, "data"> = {},
 ): SuccessResponse<{
   items: T[];
   pagination: typeof pagination;

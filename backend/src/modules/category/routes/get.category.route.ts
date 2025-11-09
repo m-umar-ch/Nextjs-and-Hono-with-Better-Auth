@@ -1,12 +1,12 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { moduleTags } from "../../module.tags";
-import { createResponseSchema } from "@/lib/schemas/api-schemas";
-import { HTTP } from "@/lib/http/status-codes";
-import { HONO_RESPONSE } from "@/lib/utils";
-import type { AppRouteHandler } from "@/lib/core/create-router";
 import { db } from "@/db";
-import { categorySchema } from "../entity/category.entity";
 import { fileSchema } from "@/db/schema";
+import type { AppRouteHandler } from "@/lib/core/create-router";
+import { HTTP } from "@/lib/http/status-codes";
+import { createResponseSchema } from "@/lib/schemas/api-schemas";
+import { HONO_RESPONSE } from "@/lib/utils";
+import { moduleTags } from "../../module.tags";
+import { categorySchema } from "../entity/category.entity";
 
 export const GET_Route = createRoute({
   path: "/category",
@@ -23,8 +23,8 @@ export const GET_Route = createRoute({
              * @todo uncomment this when product modules is completed
              */
             // totalProducts: z.number(),
-          })
-        )
+          }),
+        ),
       ),
     }),
   },
