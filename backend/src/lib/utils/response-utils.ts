@@ -281,22 +281,9 @@ export function HONO_RESPONSE<T>(
 
   const statusValue = HTTP[statusCode];
 
-  // Default messages based on status codes
-  const defaultMessages: Partial<Record<HTTPStatusKey, string>> = {
-    OK: "Operation completed successfully",
-    CREATED: "Resource created successfully",
-    ACCEPTED: "Request accepted for processing",
-    NO_CONTENT: "Operation completed successfully",
-  };
-
-  const responseMessage =
-    message ||
-    defaultMessages[statusCode] ||
-    "Operation completed successfully";
-
   const base: BaseResponse = {
     success: true,
-    message: responseMessage,
+    message: message || HTTP_STATUS_PHRASE[HTTP[statusCode]],
     statusCode: statusValue,
   };
 

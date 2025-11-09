@@ -11,14 +11,7 @@ export function getSingleImageSchema(
   }
 ) {
   const maxMB = Math.floor(maxFileSize / (1024 * 1024));
-  // const newSchema = z
-  //   .file()
-  //   .min(1)
-  //   .max(maxFileSize)
-  //   .mime(
-  //     ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/avif"],
-  //     "Only .jpg, .jpeg, .png, .webp and .avif formats are supported"
-  //   );
+
   return z
     .instanceof(File)
     .refine((file) => file.size < maxFileSize, `Max image size is ${maxMB}MB`)
@@ -32,5 +25,9 @@ export function getSingleImageSchema(
           "image/avif",
         ].includes(file.type),
       "Only .jpg, .jpeg, .png, .webp and .avif formats are supported"
-    );
+    )
+    .openapi({
+      type: "string",
+      format: "binary",
+    });
 }

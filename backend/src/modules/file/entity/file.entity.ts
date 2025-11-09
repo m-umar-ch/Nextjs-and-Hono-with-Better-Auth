@@ -2,6 +2,8 @@ import { index, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
 import { createTable } from "@/db/extras/db.utils";
+import { toZodV4SchemaTyped } from "@/lib/utils/zod-utils";
+import { createSelectSchema } from "drizzle-zod";
 
 export const file = createTable(
   "file",
@@ -21,3 +23,5 @@ export const file = createTable(
 export const fileRelations = relations(file, ({ many, one }) => ({}));
 
 export type FileTableType = InferSelectModel<typeof file>;
+
+export const fileSchema = toZodV4SchemaTyped(createSelectSchema(file));

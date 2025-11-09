@@ -49,7 +49,7 @@ export default function configureOpenAPI(app: AppOpenAPI) {
           },
         },
       },
-      defaultOpenAllTags: false,
+      defaultOpenAllTags: true,
       withDefaultFonts: true,
       // sources: [
       //   { url: "/api/doc", title: "Api", },

@@ -1,12 +1,14 @@
 import z from "zod";
-import { HTTP } from "../http/status-codes";
+import { HTTP, HTTP_STATUS_PHRASE } from "../http/status-codes";
 
-export function createOKSchema<T>({
-  description = "OK - Request successful",
+export function createResponseSchema<T>({
   data,
+  description = "OK - Request successful",
+  statusCode = "OK",
 }: {
-  description?: string;
   data: T;
+  description?: string;
+  statusCode?: keyof typeof HTTP;
 }) {
   return {
     description,
@@ -14,8 +16,13 @@ export function createOKSchema<T>({
       "application/json": {
         schema: z.object({
           success: z.boolean().default(true),
-          message: z.string().default("Operation completed successfully"),
-          statusCode: z.number().optional().default(HTTP.OK),
+          message: z
+            .string()
+            .default(
+              HTTP_STATUS_PHRASE[HTTP[statusCode]] ||
+                "Operation completed successfully"
+            ),
+          statusCode: z.number().optional().default(HTTP[statusCode]),
           data,
         }),
       },

@@ -8,6 +8,13 @@
       "when": 1762526911130,
       "tag": "0000_wonderful_terrax",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762590080465,
+      "tag": "0001_dapper_hobgoblin",
+      "breakpoints": true
     }
   ]
 }

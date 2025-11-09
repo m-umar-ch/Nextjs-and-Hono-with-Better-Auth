@@ -2,8 +2,9 @@ import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
 import { user } from "@/modules/user/entity/user.entity";
+import { createTable } from "@/db/extras/db.utils";
 
-export const session = pgTable("session", {
+export const session = createTable("session", {
   id: text("id").primaryKey(),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
@@ -19,7 +20,7 @@ export const session = pgTable("session", {
   impersonatedBy: text("impersonated_by"),
 });
 
-export const account = pgTable("account", {
+export const account = createTable("account", {
   id: text("id").primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
@@ -39,7 +40,7 @@ export const account = pgTable("account", {
     .notNull(),
 });
 
-export const verification = pgTable("verification", {
+export const verification = createTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),

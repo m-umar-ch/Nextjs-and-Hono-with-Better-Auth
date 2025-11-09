@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "bun run --hot src/main.ts",
-    "build": "pnpm build ./src/main.ts --outdir ./dist --target pnpm",
+    "build": "bun build ./src/main.ts --outdir ./dist --target bun",
     "start": "bun run dist/main.js",
     "biome:format": "npx @biomejs/biome format --write ./src",
     "db:generate": "drizzle-kit generate",

@@ -70,7 +70,7 @@ export async function saveSingleImage(img: File, customImgSlug?: string) {
 
   if (existingFile) {
     // If slug exists, generate a new one (very unlikely with nanoid)
-    const newFilename = generateUniqueFilename(img.name);
+    const newFilename = generateUniqueFilename(customImgSlug || img.name);
     const newFilePath = resolve(imagesDir, newFilename);
 
     // Move the file to the new filename

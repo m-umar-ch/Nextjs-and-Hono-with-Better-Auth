@@ -1,4 +1,11 @@
-import { index, integer, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  timestamp,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
 import { createTable } from "@/db/extras/db.utils";
@@ -24,7 +31,7 @@ export const category = createTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index().on(table.id), index().on(table.slug)]
+  (table) => [uniqueIndex("category_slug_idx").on(table.slug)]
 );
 
 export const categoryRelations = relations(category, ({ many, one }) => ({
