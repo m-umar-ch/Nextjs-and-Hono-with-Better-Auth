@@ -49,3 +49,7 @@ export const GET_Handler: AppRouteHandler<typeof GET_Route> = async (c) => {
 
   return c.json(HONO_RESPONSE({ data: categories }), HTTP.OK);
 };
+
+/**
+ * @todo handle (all) category. the one that gets you all products
+ */
