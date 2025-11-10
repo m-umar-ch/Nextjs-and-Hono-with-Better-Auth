@@ -75,7 +75,7 @@ export function isConnectionError(error: unknown): boolean {
  * }
  */
 export async function tryCatch<T, E = Error>(
-  promise: Promise<T>,
+  promise: Promise<T>
 ): Promise<Result<T, E>> {
   try {
     const data = await promise;
@@ -90,7 +90,7 @@ export async function tryCatch<T, E = Error>(
         "Connection error detected - external service may be unavailable",
         {
           error: error instanceof Error ? error.message : String(error),
-        },
+        }
       );
     }
 
@@ -165,7 +165,7 @@ export const timeout = (ms: number, message?: string): Promise<never> => {
 export async function withTimeout<T>(
   promise: Promise<T>,
   ms: number,
-  timeoutMessage?: string,
+  timeoutMessage?: string
 ): Promise<T> {
   return Promise.race([promise, timeout(ms, timeoutMessage)]);
 }
@@ -196,7 +196,7 @@ export async function retry<T>(
     maxDelay?: number;
     backoffFactor?: number;
     shouldRetry?: (error: Error) => boolean;
-  } = {},
+  } = {}
 ): Promise<T> {
   const {
     maxRetries = 3,
@@ -221,8 +221,8 @@ export async function retry<T>(
 
       // Calculate delay with exponential backoff
       const delayTime = Math.min(
-        baseDelay * Math.pow(backoffFactor, attempt),
-        maxDelay,
+        baseDelay * backoffFactor ** attempt,
+        maxDelay
       );
 
       await delay(delayTime);
@@ -251,7 +251,7 @@ export async function retry<T>(
 export async function parallelLimit<T, R>(
   items: T[],
   fn: (item: T, index: number) => Promise<R>,
-  concurrency: number = 5,
+  concurrency: number = 5
 ): Promise<R[]> {
   const results: R[] = new Array(items.length);
   const semaphore = new Array(concurrency).fill(null);

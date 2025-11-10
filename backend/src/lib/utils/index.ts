@@ -5,42 +5,40 @@
  * organized by category for better discoverability and maintainability.
  */
 
-// String utilities
-export {
-  slugify,
-  deSlugify,
-  capitalize,
-  toTitleCase,
-  truncate,
-  stripHtml,
-} from "./string-utils";
-
 // Async utilities and Result pattern
 export {
+  delay,
+  isConnectionError,
+  isFailure,
+  isSuccess,
+  parallelLimit,
+  type Result,
+  retry,
+  timeout,
   tryCatch,
   tryCatchSync,
-  delay,
-  timeout,
   withTimeout,
-  retry,
-  parallelLimit,
-  isSuccess,
-  isFailure,
-  isConnectionError,
-  type Result,
 } from "./async-utils";
+// Re-export commonly used types for convenience
+export type { HTTPStatusKey, HTTPStatusValue } from "./response-utils";
 
 // HTTP response utilities
 export {
-  HONO_ERROR,
-  HONO_RESPONSE,
-  HONO_PAGINATED_RESPONSE,
   type ErrorResponse,
+  HONO_ERROR,
+  HONO_PAGINATED_RESPONSE,
+  HONO_RESPONSE,
   type SuccessResponse,
 } from "./response-utils";
-
-// Re-export commonly used types for convenience
-export type { HTTPStatusKey, HTTPStatusValue } from "./response-utils";
+// String utilities
+export {
+  capitalize,
+  deSlugify,
+  slugify,
+  stripHtml,
+  toTitleCase,
+  truncate,
+} from "./string-utils";
 
 /**
  * Utility categories for reference:

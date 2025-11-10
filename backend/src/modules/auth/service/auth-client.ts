@@ -1,4 +1,5 @@
 import { createAuthClient } from "better-auth/client";
+import { adminClient, emailOTPClient } from "better-auth/client/plugins";
 import env from "@/env";
 import {
   ac,
@@ -9,7 +10,6 @@ import {
   superAdmin,
   vendor,
 } from "./permissions";
-import { adminClient, emailOTPClient } from "better-auth/client/plugins";
 
 // Create Better Auth client for client-side usage
 export const authClient = createAuthClient({

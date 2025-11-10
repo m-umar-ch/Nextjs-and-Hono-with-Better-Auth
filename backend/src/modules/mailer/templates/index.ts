@@ -1,24 +1,23 @@
-export { welcomeEmailTemplate, type WelcomeEmailData } from "./welcome";
 export {
-  passwordResetEmailTemplate,
-  type PasswordResetEmailData,
-} from "./password-reset";
-export {
-  orderConfirmationEmailTemplate,
-  type OrderConfirmationEmailData,
-} from "./order-confirmation";
-export {
-  emailVerificationEmailTemplate,
   type EmailVerificationEmailData,
+  emailVerificationEmailTemplate,
 } from "./email-verification";
-
 // OTP Templates
 export {
-  emailVerificationOTPTemplate,
   type EmailVerificationOTPData,
+  emailVerificationOTPTemplate,
 } from "./email-verification-otp";
 export {
-  passwordResetOTPTemplate,
+  type OrderConfirmationEmailData,
+  orderConfirmationEmailTemplate,
+} from "./order-confirmation";
+export {
+  type PasswordResetEmailData,
+  passwordResetEmailTemplate,
+} from "./password-reset";
+export {
   type PasswordResetOTPData,
+  passwordResetOTPTemplate,
 } from "./password-reset-otp";
-export { signinOTPTemplate, type SigninOTPData } from "./signin-otp";
+export { type SigninOTPData, signinOTPTemplate } from "./signin-otp";
+export { type WelcomeEmailData, welcomeEmailTemplate } from "./welcome";

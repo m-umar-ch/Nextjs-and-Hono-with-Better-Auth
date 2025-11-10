@@ -10,7 +10,7 @@ import { moduleTags } from "../../module.tags";
 import { category, categorySchema } from "../entity/category.entity";
 
 export const GET_ONE_Route = createRoute({
-  path: "/category/{slug}",
+  path: "/public/category/{slug}",
   method: "get",
   tags: moduleTags.category,
   request: { params: z.object({ slug: z.string().min(1) }) },
@@ -23,7 +23,7 @@ export const GET_ONE_Route = createRoute({
            * @todo uncomment this when product modules is completed
            */
           // totalProducts: z.number(),
-        }),
+        })
       ),
     }),
     [HTTP.NOT_FOUND]: APISchema.NOT_FOUND,
@@ -31,7 +31,7 @@ export const GET_ONE_Route = createRoute({
 });
 
 export const GET_ONE_Handler: AppRouteHandler<typeof GET_ONE_Route> = async (
-  c,
+  c
 ) => {
   const { slug } = c.req.valid("param");
   const categoryPrepare = db.query.category
@@ -56,7 +56,7 @@ export const GET_ONE_Handler: AppRouteHandler<typeof GET_ONE_Route> = async (
   if (!categoryResponse) {
     return c.json(
       HONO_ERROR("NOT_FOUND", "Category Not Found"),
-      HTTP.NOT_FOUND,
+      HTTP.NOT_FOUND
     );
   }
 

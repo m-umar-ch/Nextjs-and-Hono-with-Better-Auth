@@ -1,7 +1,7 @@
-import { Context, Next } from "hono";
-import { Sentry } from "../core/sentry";
-import { HONO_LOGGER, logger } from "../core/hono-logger";
+import type { Context, Next } from "hono";
 import env from "../../env";
+import { HONO_LOGGER } from "../core/hono-logger";
+import { Sentry } from "../core/sentry";
 
 /**
  * Sentry middleware for request context tracking and error handling
@@ -57,7 +57,7 @@ export const sentryErrorHandler = (originalErrorHandler: any) => {
         method: c.req.method,
         url: c.req.url,
         userAgent: c.req.header("user-agent"),
-      },
+      }
     );
 
     // Call the original error handler

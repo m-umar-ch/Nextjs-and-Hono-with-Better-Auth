@@ -1,8 +1,8 @@
+import type { InferSelectModel } from "drizzle-orm";
+import { relations } from "drizzle-orm";
+import { boolean, text, timestamp } from "drizzle-orm/pg-core";
 import { createTable } from "@/db/extras/db.utils";
 import { Roles } from "@/modules/auth/service/permissions";
-import { relations } from "drizzle-orm";
-import type { InferSelectModel } from "drizzle-orm";
-import { boolean, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = createTable("user", {
   id: text("id").primaryKey(),
@@ -21,8 +21,8 @@ export const user = createTable("user", {
     .notNull(),
 });
 
-// User relations (extend auth relations if needed)
-export const userRelations = relations(user, ({ many, one }) => ({}));
+// User relations
+// export const userRelations = relations(user, ({ many, one }) => ({}));
 
 // Export user type
 export type UserTableType = InferSelectModel<typeof user>;

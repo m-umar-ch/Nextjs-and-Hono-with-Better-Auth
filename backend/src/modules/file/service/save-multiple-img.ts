@@ -1,5 +1,4 @@
 import { saveSingleImage } from "./save-single-img";
-import type { FileTableType } from "@/modules/file/entity/file.entity";
 
 // export interface SaveMultipleImageResult {
 //   data: {
@@ -39,7 +38,7 @@ export async function saveMultipleImages(
     img: File;
     customImgSlug?: string;
     sortOrder?: number;
-  }[],
+  }[]
 ) {
   // Process all images in parallel
   const results = await Promise.all(
@@ -69,7 +68,7 @@ export async function saveMultipleImages(
         success: false,
         sortOrder: sortOrder,
       } as const;
-    }),
+    })
   );
 
   return results;

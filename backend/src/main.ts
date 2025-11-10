@@ -1,30 +1,30 @@
 import { initializeSentry } from "./lib/core/sentry";
+
 initializeSentry();
 
-import { createRouter } from "./lib/core/create-router";
-import { requestId } from "hono/request-id";
-import { logger } from "hono/logger";
-import { logger as HonoLogger } from "./lib/core/hono-logger";
-import { onError } from "./lib/middlewares/on-error.middleware";
-import {
-  sentryMiddleware,
-  sentryErrorHandler,
-} from "./lib/middlewares/sentry.middleware";
-import configureOpenAPI from "./lib/core/open-api.config";
-import env from "./env";
 import { serve } from "bun";
-import { createNotFoundHandler } from "./lib/middlewares/not-found-middleware";
-import { faviconMiddleware } from "./lib/middlewares/favicon-middleware";
+import { logger } from "hono/logger";
+import { requestId } from "hono/request-id";
+import env from "./env";
+import { createRouter } from "./lib/core/create-router";
+import { logger as HonoLogger } from "./lib/core/hono-logger";
+import configureOpenAPI from "./lib/core/open-api.config";
 import { HTTP } from "./lib/http/status-codes";
-import { APISchema } from "./lib/schemas/api-schemas";
-import { HONO_ERROR, HONO_RESPONSE } from "./lib/utils";
-import { mailerController } from "./modules/mailer/controller/mailer.controller";
-import { auth } from "./modules/auth/service/auth";
 import { authMiddleware } from "./lib/middlewares/auth.middleware";
 import { Auth_CORS_Middleware } from "./lib/middlewares/cors.middleware";
+import { faviconMiddleware } from "./lib/middlewares/favicon-middleware";
+import { createNotFoundHandler } from "./lib/middlewares/not-found-middleware";
+import { onError } from "./lib/middlewares/on-error.middleware";
+import {
+  sentryErrorHandler,
+  sentryMiddleware,
+} from "./lib/middlewares/sentry.middleware";
+import { APISchema } from "./lib/schemas/api-schemas";
+import { HONO_ERROR, HONO_RESPONSE } from "./lib/utils";
+import { auth } from "./modules/auth/service/auth";
 import { categoryController } from "./modules/category/controller/category.controller";
 import { fileController } from "./modules/file/controller/file.controller";
-import { serveStatic } from "hono/bun";
+import { mailerController } from "./modules/mailer/controller/mailer.controller";
 
 const createApp = () => {
   const app = createRouter().basePath("/api");
@@ -74,7 +74,7 @@ app.openapi(
     }
 
     return c.json(HONO_RESPONSE({ message: "Yollo Bozo" }), HTTP.OK);
-  },
+  }
 );
 
 // app.openapi(
@@ -136,7 +136,7 @@ serve({
 
 HonoLogger(`🚀 Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
 HonoLogger(
-  `📚 Scalar API documentation available at: http://localhost:${env.PORT}/api/reference`,
+  `📚 Scalar API documentation available at: http://localhost:${env.PORT}/api/reference`
 );
 
 // export type AppType = (typeof controllers)[number];

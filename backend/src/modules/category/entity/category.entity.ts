@@ -1,16 +1,15 @@
+import type { InferSelectModel } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
-  index,
   integer,
   timestamp,
   uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import type { InferSelectModel } from "drizzle-orm";
+import { createSelectSchema } from "drizzle-zod";
 import { createTable } from "@/db/extras/db.utils";
 import { file } from "@/db/schema";
-import { createSelectSchema } from "drizzle-zod";
 import { toZodV4SchemaTyped } from "@/lib/utils/zod-utils";
 
 export const category = createTable(
@@ -31,10 +30,10 @@ export const category = createTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [uniqueIndex("category_slug_idx").on(table.slug)],
+  (table) => [uniqueIndex("category_slug_idx").on(table.slug)]
 );
 
-export const categoryRelations = relations(category, ({ many, one }) => ({
+export const categoryRelations = relations(category, ({ one }) => ({
   img: one(file, { fields: [category.categoryImgID], references: [file.id] }),
 }));
 

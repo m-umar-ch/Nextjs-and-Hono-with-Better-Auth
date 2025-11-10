@@ -2,12 +2,12 @@ import type { ErrorHandler } from "hono";
 
 import type { ContentfulStatusCode, StatusCode } from "hono/utils/http-status";
 import env from "@/env";
+import { HONO_LOGGER } from "../core/hono-logger";
 import {
   HTTP_STATUS_PHRASE,
   INTERNAL_SERVER_ERROR,
   OK,
 } from "../http/status-codes";
-import { HONO_LOGGER } from "../core/hono-logger";
 
 export const onError: ErrorHandler = (err, c) => {
   const currentStatus =
@@ -37,6 +37,6 @@ export const onError: ErrorHandler = (err, c) => {
 
       stack: curr_env === "production" ? undefined : err.stack,
     },
-    statusCode as ContentfulStatusCode,
+    statusCode as ContentfulStatusCode
   );
 };

@@ -1,14 +1,14 @@
+import { stat } from "node:fs/promises";
 import { createRoute, z } from "@hono/zod-openapi";
-import { moduleTags } from "../../module.tags";
-import { APISchema } from "@/lib/schemas/api-schemas";
+import type { AppRouteHandler } from "@/lib/core/create-router";
 import { HTTP } from "@/lib/http/status-codes";
+import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR } from "@/lib/utils";
-import { AppRouteHandler } from "@/lib/core/create-router";
-import { stat } from "fs/promises";
+import { moduleTags } from "../../module.tags";
 import { getContentType, sanitizeFilePath } from "../service/file-utils";
 
 export const GET_IMG_Route = createRoute({
-  path: "/file/get-img-by-slug/{slug}",
+  path: "/public/file/get-img-by-slug/{slug}",
   method: "get",
   tags: moduleTags.file,
   request: {
@@ -28,7 +28,7 @@ export const GET_IMG_Route = createRoute({
 });
 
 export const GET_IMG_Handler: AppRouteHandler<typeof GET_IMG_Route> = async (
-  c,
+  c
 ) => {
   const { slug } = c.req.valid("param");
 
@@ -37,7 +37,7 @@ export const GET_IMG_Handler: AppRouteHandler<typeof GET_IMG_Route> = async (
   if (!filePath) {
     return c.json(
       HONO_ERROR("BAD_REQUEST", "Invalid file path"),
-      HTTP.BAD_REQUEST,
+      HTTP.BAD_REQUEST
     );
   }
 

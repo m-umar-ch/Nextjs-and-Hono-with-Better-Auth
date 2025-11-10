@@ -15,6 +15,13 @@
       "when": 1762590080465,
       "tag": "0001_dapper_hobgoblin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762759798151,
+      "tag": "0002_lazy_shiva",
+      "breakpoints": true
     }
   ]
 }

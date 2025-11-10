@@ -1,15 +1,13 @@
 import {
-  OpenAPIHono,
-  RouteConfig,
-  RouteHandler,
   type Hook,
+  OpenAPIHono,
+  type RouteConfig,
+  type RouteHandler,
 } from "@hono/zod-openapi";
+import type { Context, Schema } from "hono";
+import type { authClient } from "@/modules/auth/service/auth-client";
 import { UNPROCESSABLE_ENTITY } from "../http/status-codes";
 import { HONO_ERROR } from "../utils/response-utils";
-import type { Context } from "hono";
-import type { ZodError } from "zod";
-import { authClient } from "@/modules/auth/service/auth-client";
-import type { Schema } from "hono";
 
 /**
  * Configuration options for creating a router instance
@@ -28,7 +26,7 @@ export interface RouterConfig {
  * Provides standardized error responses with detailed validation information
  */
 const createDefaultHook = (
-  includeErrorDetails = true,
+  includeErrorDetails = true
 ): Hook<any, any, any, any> => {
   return (result, c: Context) => {
     if (!result.success) {
@@ -50,7 +48,7 @@ const createDefaultHook = (
           issues: issues.length > 0 ? issues : undefined,
           requestId,
           timestamp: true,
-        },
+        }
       );
 
       return c.json(errorResponse, UNPROCESSABLE_ENTITY);

@@ -1,22 +1,22 @@
 import { Resend } from "resend";
 import env from "@/env";
+import { HONO_LOGGER } from "@/lib/core/hono-logger";
 import {
-  welcomeEmailTemplate,
-  passwordResetEmailTemplate,
-  orderConfirmationEmailTemplate,
-  emailVerificationEmailTemplate,
-  emailVerificationOTPTemplate,
-  passwordResetOTPTemplate,
-  signinOTPTemplate,
-  type WelcomeEmailData,
-  type PasswordResetEmailData,
-  type OrderConfirmationEmailData,
   type EmailVerificationEmailData,
   type EmailVerificationOTPData,
+  emailVerificationEmailTemplate,
+  emailVerificationOTPTemplate,
+  type OrderConfirmationEmailData,
+  orderConfirmationEmailTemplate,
+  type PasswordResetEmailData,
   type PasswordResetOTPData,
+  passwordResetEmailTemplate,
+  passwordResetOTPTemplate,
   type SigninOTPData,
+  signinOTPTemplate,
+  type WelcomeEmailData,
+  welcomeEmailTemplate,
 } from "../templates";
-import { HONO_LOGGER } from "@/lib/core/hono-logger";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
@@ -43,7 +43,7 @@ export interface EmailResponse {
  * @returns Promise with email response
  */
 export const sendEmail = async (
-  options: EmailOptions,
+  options: EmailOptions
 ): Promise<EmailResponse> => {
   try {
     // Ensure at least text or html is provided
@@ -105,7 +105,7 @@ export const sendEmail = async (
  */
 export const sendWelcomeEmail = async (
   to: string,
-  name: string,
+  name: string
 ): Promise<EmailResponse> => {
   const data: WelcomeEmailData = { name };
 
@@ -125,7 +125,7 @@ export const sendWelcomeEmail = async (
  */
 export const sendPasswordResetEmail = async (
   to: string,
-  resetLink: string,
+  resetLink: string
 ): Promise<EmailResponse> => {
   const data: PasswordResetEmailData = { resetLink };
 
@@ -147,7 +147,7 @@ export const sendPasswordResetEmail = async (
 export const sendOrderConfirmationEmail = async (
   to: string,
   orderNumber: string,
-  orderTotal: string,
+  orderTotal: string
 ): Promise<EmailResponse> => {
   const data: OrderConfirmationEmailData = { orderNumber, orderTotal };
 
@@ -169,7 +169,7 @@ export const sendOrderConfirmationEmail = async (
 export const sendEmailVerificationEmail = async (
   to: string,
   verificationLink: string,
-  userName?: string,
+  userName?: string
 ): Promise<EmailResponse> => {
   const data: EmailVerificationEmailData = { verificationLink, userName };
 
@@ -191,7 +191,7 @@ export const sendEmailVerificationEmail = async (
 export const sendEmailVerificationOTP = async (
   to: string,
   otp: string,
-  userName?: string,
+  userName?: string
 ): Promise<EmailResponse> => {
   const data: EmailVerificationOTPData = { otp, userName };
 
@@ -213,7 +213,7 @@ export const sendEmailVerificationOTP = async (
 export const sendPasswordResetOTP = async (
   to: string,
   otp: string,
-  userName?: string,
+  userName?: string
 ): Promise<EmailResponse> => {
   const data: PasswordResetOTPData = { otp, userName };
 
@@ -235,7 +235,7 @@ export const sendPasswordResetOTP = async (
 export const sendSigninOTP = async (
   to: string,
   otp: string,
-  userName?: string,
+  userName?: string
 ): Promise<EmailResponse> => {
   const data: SigninOTPData = { otp, userName };
 

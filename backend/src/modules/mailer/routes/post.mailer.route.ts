@@ -1,9 +1,9 @@
-import { createRoute, RouteHandler, z } from "@hono/zod-openapi";
-import { moduleTags } from "@/modules/module.tags";
+import { createRoute, z } from "@hono/zod-openapi";
+import type { AppRouteHandler } from "@/lib/core/create-router";
 import { HTTP } from "@/lib/http/status-codes";
 import { APISchema } from "@/lib/schemas/api-schemas";
-import { HONO_RESPONSE, HONO_ERROR } from "@/lib/utils";
-import { AppRouteHandler } from "@/lib/core/create-router";
+import { HONO_ERROR, HONO_RESPONSE } from "@/lib/utils";
+import { moduleTags } from "@/modules/module.tags";
 import { sendEmail } from "../service/mailer.service";
 
 /**
@@ -84,7 +84,7 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
         HONO_ERROR("BAD_REQUEST", "Failed to send email", {
           issues: [{ message: result.error || "Unknown error occurred" }],
         }),
-        HTTP.BAD_REQUEST,
+        HTTP.BAD_REQUEST
       );
     }
 
@@ -93,7 +93,7 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
         message: "Email sent successfully",
         data: result.data,
       }),
-      HTTP.OK,
+      HTTP.OK
     );
   } catch (error) {
     return c.json(
@@ -106,7 +106,7 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
         ],
         error,
       }),
-      HTTP.INTERNAL_SERVER_ERROR,
+      HTTP.INTERNAL_SERVER_ERROR
     );
   }
 };

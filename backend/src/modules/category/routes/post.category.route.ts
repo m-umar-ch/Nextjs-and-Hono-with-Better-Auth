@@ -1,16 +1,16 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { moduleTags } from "../../module.tags";
-import { APISchema, createResponseSchema } from "@/lib/schemas/api-schemas";
-import { HTTP } from "@/lib/http/status-codes";
-import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
-import { AppRouteHandler } from "@/lib/core/create-router";
-import { getSingleImageSchema } from "@/modules/file/service/get-file-openapi.schema";
+import { desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { category, categorySchema } from "../entity/category.entity";
-import { eq, desc } from "drizzle-orm";
-import { saveSingleImage } from "@/modules/file/service/save-single-img";
-import { deleteImage } from "@/modules/file/service/delete-image";
+import type { AppRouteHandler } from "@/lib/core/create-router";
 import { HONO_LOGGER } from "@/lib/core/hono-logger";
+import { HTTP } from "@/lib/http/status-codes";
+import { APISchema, createResponseSchema } from "@/lib/schemas/api-schemas";
+import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
+import { deleteImage } from "@/modules/file/service/delete-image";
+import { getSingleImageSchema } from "@/modules/file/service/get-file-openapi.schema";
+import { saveSingleImage } from "@/modules/file/service/save-single-img";
+import { moduleTags } from "../../module.tags";
+import { category, categorySchema } from "../entity/category.entity";
 
 export const POST_Route = createRoute({
   path: "/category",
@@ -52,7 +52,7 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
   if (alreadyExists) {
     return c.json(
       HONO_ERROR("UNPROCESSABLE_ENTITY", "Image Slug already exists"),
-      HTTP.UNPROCESSABLE_ENTITY,
+      HTTP.UNPROCESSABLE_ENTITY
     );
   }
 
@@ -62,9 +62,9 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
     return c.json(
       HONO_ERROR(
         "INTERNAL_SERVER_ERROR",
-        `Failed to upload image: ${imageResponse.error.message}`,
+        `Failed to upload image: ${imageResponse.error.message}`
       ),
-      HTTP.INTERNAL_SERVER_ERROR,
+      HTTP.INTERNAL_SERVER_ERROR
     );
   }
 
@@ -93,18 +93,18 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
       if (deleteResult.error) {
         HONO_LOGGER.error(
           `Failed to clean up image ${imageResponse.data.slug}:`,
-          deleteResult.error,
+          deleteResult.error
         );
       }
     }
     return c.json(
       HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to create category record."),
-      HTTP.INTERNAL_SERVER_ERROR,
+      HTTP.INTERNAL_SERVER_ERROR
     );
   }
 
   return c.json(
     HONO_RESPONSE({ data: categoryResponse, statusCode: "CREATED" }),
-    HTTP.CREATED,
+    HTTP.CREATED
   );
 };

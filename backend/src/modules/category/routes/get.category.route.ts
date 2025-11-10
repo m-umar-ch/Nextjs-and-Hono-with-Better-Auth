@@ -9,7 +9,7 @@ import { moduleTags } from "../../module.tags";
 import { categorySchema } from "../entity/category.entity";
 
 export const GET_Route = createRoute({
-  path: "/category",
+  path: "/public/category",
   method: "get",
   tags: moduleTags.category,
   request: {},
@@ -23,8 +23,8 @@ export const GET_Route = createRoute({
              * @todo uncomment this when product modules is completed
              */
             // totalProducts: z.number(),
-          }),
-        ),
+          })
+        )
       ),
     }),
   },

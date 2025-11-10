@@ -1,19 +1,17 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { admin as adminPlugin, emailOTP, openAPI } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
+import { user } from "@/db/schema";
 import env from "@/env";
+import { HONO_LOGGER } from "@/lib/core/hono-logger";
+import { tryCatch } from "@/lib/utils";
 import {
   sendEmailVerificationOTP,
   sendPasswordResetOTP,
   sendSigninOTP,
 } from "@/modules/mailer";
-import { HONO_LOGGER } from "@/lib/core/hono-logger";
-import {
-  admin as adminPlugin,
-  emailOTP,
-  openAPI,
-  username,
-} from "better-auth/plugins";
 import {
   ac,
   admin,
@@ -24,9 +22,6 @@ import {
   superAdmin,
   vendor,
 } from "./permissions";
-import { tryCatch } from "@/lib/utils";
-import { eq } from "drizzle-orm";
-import { user } from "@/db/schema";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -58,7 +53,7 @@ export const auth = betterAuth({
             db.query.user.findFirst({
               where: eq(user.email, email),
               columns: { name: true },
-            }),
+            })
           );
           userName = data?.name;
           if (error) {

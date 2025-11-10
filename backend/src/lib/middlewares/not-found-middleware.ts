@@ -38,7 +38,7 @@ export interface NotFoundConfig {
  * ```
  */
 export function createNotFoundHandler(
-  config: NotFoundConfig = {},
+  config: NotFoundConfig = {}
 ): NotFoundHandler {
   const { enableLogging = true, customMessage } = config;
 

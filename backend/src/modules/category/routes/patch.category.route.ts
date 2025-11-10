@@ -1,9 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
-import { moduleTags } from "../../module.tags";
-import { APISchema } from "@/lib/schemas/api-schemas";
+import type { AppRouteHandler } from "@/lib/core/create-router";
 import { HTTP } from "@/lib/http/status-codes";
+import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_RESPONSE } from "@/lib/utils";
-import { AppRouteHandler } from "@/lib/core/create-router";
+import { moduleTags } from "../../module.tags";
 
 export const PATCH_Route = createRoute({
   path: "/category",

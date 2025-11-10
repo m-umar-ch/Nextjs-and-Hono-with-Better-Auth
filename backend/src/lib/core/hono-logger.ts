@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
-import { Sentry } from "./sentry";
 import env from "../../env";
+import { Sentry } from "./sentry";
 
 /**
  * NOTE: Sentry profiling is disabled for Bun compatibility
@@ -56,7 +56,7 @@ const formatContext = (context?: LogContext): string => {
 const createLogEntry = (
   level: keyof typeof SENTRY_LEVELS,
   message: string,
-  context?: LogContext,
+  context?: LogContext
 ) => {
   const logId = ["error", "warn", "verbose"].includes(level)
     ? nanoid()
@@ -90,7 +90,7 @@ const createLogEntry = (
 export const logger = (message: string, ...rest: string[]) => {
   console.log(
     `${COLORS.Dim}[${new Date().toUTCString()}]:${COLORS.Reset} ${message}`,
-    `${rest.join(" ")}`,
+    `${rest.join(" ")}`
   );
 };
 
@@ -210,7 +210,7 @@ export const HONO_LOGGER = {
         COLORS.Reset
       }${COLORS.hex("#d11824ff")} ERROR - ${logEntry.fullMessage}${
         COLORS.Reset
-      }`,
+      }`
     );
   },
 
@@ -239,8 +239,8 @@ export const HONO_LOGGER = {
     // Console logging only - no automatic Sentry integration
     console.log(
       `${COLORS.Dim}[${logEntry.timestamp}]: -${COLORS.Reset}${COLORS.hex(
-        "#da61e7ff",
-      )} DEBUG - ${logEntry.fullMessage}${COLORS.Reset}`,
+        "#da61e7ff"
+      )} DEBUG - ${logEntry.fullMessage}${COLORS.Reset}`
     );
   },
 
@@ -270,8 +270,8 @@ export const HONO_LOGGER = {
     // Console logging only - no automatic Sentry integration
     console.log(
       `${COLORS.Dim}[${logEntry.timestamp}]: -${COLORS.Reset}${COLORS.hex(
-        "#22b872ff",
-      )} LOG - ${logEntry.fullMessage}${COLORS.Reset}`,
+        "#22b872ff"
+      )} LOG - ${logEntry.fullMessage}${COLORS.Reset}`
     );
   },
 
@@ -301,8 +301,8 @@ export const HONO_LOGGER = {
     // Console logging only - no automatic Sentry integration
     console.log(
       `${COLORS.Dim}[${logEntry.timestamp}]: -${COLORS.Reset}${COLORS.hex(
-        "#22b872ff",
-      )} INFO - ${logEntry.fullMessage}${COLORS.Reset}`,
+        "#22b872ff"
+      )} INFO - ${logEntry.fullMessage}${COLORS.Reset}`
     );
   },
 
@@ -335,7 +335,7 @@ export const HONO_LOGGER = {
     console.log(
       `${COLORS.Dim}[${logEntry.timestamp}]: ${logEntry.logId} -${
         COLORS.Reset
-      }${COLORS.hex("#bb7339ff")} WARN - ${logEntry.fullMessage}${COLORS.Reset}`,
+      }${COLORS.hex("#bb7339ff")} WARN - ${logEntry.fullMessage}${COLORS.Reset}`
     );
   },
 
@@ -369,7 +369,7 @@ export const HONO_LOGGER = {
         COLORS.Reset
       }${COLORS.hex("#33c7de")} VERBOSE - ${logEntry.fullMessage}${
         COLORS.Reset
-      }`,
+      }`
     );
   },
 
@@ -425,7 +425,7 @@ export const HONO_LOGGER = {
      */
     captureException: (
       error: Error | unknown,
-      context?: Record<string, any>,
+      context?: Record<string, any>
     ) => {
       const logId = nanoid();
 
@@ -517,7 +517,7 @@ export const HONO_LOGGER = {
     captureMessage: (
       message: string,
       level: "debug" | "info" | "warning" | "error" | "fatal" = "info",
-      extra?: Record<string, any>,
+      extra?: Record<string, any>
     ) => {
       const logId = nanoid();
 
@@ -552,7 +552,7 @@ export const HONO_LOGGER = {
       message: string,
       category = "custom",
       level: "debug" | "info" | "warning" | "error" | "fatal" = "info",
-      data?: Record<string, any>,
+      data?: Record<string, any>
     ) => {
       if (env.SENTRY_ENABLED) {
         Sentry.addBreadcrumb({

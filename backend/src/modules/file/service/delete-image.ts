@@ -1,4 +1,4 @@
-import { unlink } from "fs/promises";
+import { unlink } from "node:fs/promises";
 import { tryCatch } from "@/lib/utils";
 import { sanitizeFilePath } from "./file-utils";
 

@@ -1,6 +1,6 @@
-import { slugify } from "@/lib/utils";
+import { extname, relative, resolve } from "node:path";
 import { nanoid } from "nanoid";
-import { extname, resolve, relative } from "path";
+import { slugify } from "@/lib/utils";
 
 export const imagesDir = resolve(process.cwd(), "public", "image");
 
