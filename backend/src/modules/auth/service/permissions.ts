@@ -29,7 +29,6 @@ import { defaultStatements } from "better-auth/plugins/admin/access";
  * ```
  */
 
-// prettier-ignore
 /**
  * Permission statements for the ecommerce platform
  * Defines all available actions for each resource type

@@ -14,7 +14,7 @@ export default function configureOpenAPI(app: AppOpenAPI) {
         "E-commerce backend API with authentication and user management",
     },
     // servers: [
-    //   { url: "/api/better-auth/open-api/generate-schema" },
+    // { url: "/api/better-auth/open-api/generate-schema" },
     //   // Better Auth schema generation endpoint
     //   { url: "/api/doc" },
     // ],
@@ -55,6 +55,6 @@ export default function configureOpenAPI(app: AppOpenAPI) {
       //   { url: "/api/doc", title: "Api", },
       //   { url: "/api/better-auth/reference", title: "Auth" }
       // ]
-    }),
+    })
   );
 }

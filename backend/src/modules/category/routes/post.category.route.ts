@@ -1,11 +1,13 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import type { AppRouteHandler } from "@/lib/core/create-router";
+import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
 import { HONO_LOGGER } from "@/lib/core/hono-logger";
 import { HTTP } from "@/lib/http/status-codes";
+import { requireAuth } from "@/lib/middlewares/auth.middleware";
 import { APISchema, createResponseSchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
+import { auth } from "@/modules/auth/service/auth";
 import { deleteImage } from "@/modules/file/service/delete-image";
 import { getSingleImageSchema } from "@/modules/file/service/get-file-openapi.schema";
 import { saveSingleImage } from "@/modules/file/service/save-single-img";
@@ -30,6 +32,7 @@ export const POST_Route = createRoute({
       required: true,
     },
   },
+  middleware: [requireAuth],
   responses: {
     [HTTP.CREATED]: createResponseSchema({
       data: categorySchema,
@@ -38,11 +41,32 @@ export const POST_Route = createRoute({
     }),
     [HTTP.UNPROCESSABLE_ENTITY]: APISchema.UNPROCESSABLE_ENTITY,
     [HTTP.BAD_REQUEST]: APISchema.BAD_REQUEST,
+    [HTTP.UNAUTHORIZED]: APISchema.UNAUTHORIZED,
+    [HTTP.FORBIDDEN]: APISchema.FORBIDDEN,
     [HTTP.INTERNAL_SERVER_ERROR]: APISchema.INTERNAL_SERVER_ERROR,
   },
 });
 
-export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
+export const POST_Handler: AuthenticatedRouteHandler<
+  typeof POST_Route
+> = async (c) => {
+  const hasPermission = await auth.api.userHasPermission({
+    body: {
+      userId: c.var.user.id,
+      permission: { category: ["create"] },
+    },
+  });
+
+  if (!hasPermission.success) {
+    return c.json(
+      HONO_ERROR(
+        "FORBIDDEN",
+        "You don't have permission to perform this action"
+      ),
+      HTTP.FORBIDDEN
+    );
+  }
+
   const { image, name, slug: unSlugifiedSlug } = c.req.valid("form");
   const slug = slugify(unSlugifiedSlug);
 
@@ -51,18 +75,22 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
   });
   if (alreadyExists) {
     return c.json(
-      HONO_ERROR("UNPROCESSABLE_ENTITY", "Image Slug already exists"),
+      HONO_ERROR("UNPROCESSABLE_ENTITY", "Category slug already exists"),
       HTTP.UNPROCESSABLE_ENTITY
     );
   }
 
   const imageResponse = await saveSingleImage(image);
-  if (imageResponse.error) {
-    HONO_LOGGER.error(`Image upload failed for ${image.name}`);
+  if (!imageResponse.success || !imageResponse.data) {
+    HONO_LOGGER.error(`Image upload failed for ${image.name}`, {
+      error: imageResponse.error,
+    });
     return c.json(
       HONO_ERROR(
         "INTERNAL_SERVER_ERROR",
-        `Failed to upload image: ${imageResponse.error.message}`
+        `Failed to upload image: ${
+          imageResponse.error?.message || "Unknown error"
+        }`
       ),
       HTTP.INTERNAL_SERVER_ERROR
     );
@@ -88,17 +116,18 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
     .returning();
 
   if (!categoryResponse) {
+    // Clean up uploaded image if category creation fails
     if (imageResponse.data.slug) {
       const deleteResult = await deleteImage(imageResponse.data.slug);
-      if (deleteResult.error) {
+      if (!deleteResult.success) {
         HONO_LOGGER.error(
-          `Failed to clean up image ${imageResponse.data.slug}:`,
-          deleteResult.error
+          `Failed to clean up image ${imageResponse.data.slug} after category creation failure`,
+          { error: deleteResult.error }
         );
       }
     }
     return c.json(
-      HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to create category record."),
+      HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to create category record"),
       HTTP.INTERNAL_SERVER_ERROR
     );
   }

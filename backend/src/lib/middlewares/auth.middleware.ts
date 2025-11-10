@@ -1,5 +1,8 @@
 import { createMiddleware } from "hono/factory";
 import { auth } from "@/modules/auth/service/auth";
+import type { AppMiddleware } from "../core/create-router";
+import { HTTP } from "../http/status-codes";
+import { HONO_ERROR } from "../utils";
 
 /**
  * Middleware for authentication handling in the application.
@@ -37,5 +40,19 @@ export const authMiddleware = createMiddleware(async (c, next) => {
   }
   c.set("user", session.user);
   c.set("session", session.session);
+  await next();
+});
+
+/**
+ * Middleware to ensure the user is authenticated and authorized.
+ * Blocks access if there is no valid user or session.
+ */
+export const requireAuth: AppMiddleware = createMiddleware(async (c, next) => {
+  if (!c.var.session || !c.var.user) {
+    return c.json(
+      HONO_ERROR("FORBIDDEN", "Authentication required"),
+      HTTP.FORBIDDEN
+    );
+  }
   await next();
 });

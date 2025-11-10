@@ -4,7 +4,7 @@ import {
   type RouteConfig,
   type RouteHandler,
 } from "@hono/zod-openapi";
-import type { Context, Schema } from "hono";
+import type { Context, MiddlewareHandler, Schema } from "hono";
 import type { authClient } from "@/modules/auth/service/auth-client";
 import { UNPROCESSABLE_ENTITY } from "../http/status-codes";
 import { HONO_ERROR } from "../utils/response-utils";
@@ -89,6 +89,17 @@ export interface AppBindings {
   };
 }
 
+/**
+ * Bindings where user and session are guaranteed to be non-null
+ * (e.g., after requireAuth middleware)
+ */
+export interface AuthenticatedAppBindings {
+  Variables: {
+    user: typeof authClient.$Infer.Session.user;
+    session: typeof authClient.$Infer.Session.session;
+  };
+}
+
 // eslint-disable-next-line ts/no-empty-object-type
 export type AppOpenAPI<S extends Schema = {}> = OpenAPIHono<AppBindings, S>;
 
@@ -96,6 +107,17 @@ export type AppRouteHandler<R extends RouteConfig> = RouteHandler<
   R,
   AppBindings
 >;
+
+/**
+ * Route handler type for routes with requireAuth middleware
+ * User and session are guaranteed to be non-null
+ */
+export type AuthenticatedRouteHandler<R extends RouteConfig> = RouteHandler<
+  R,
+  AuthenticatedAppBindings
+>;
+
+export type AppMiddleware = MiddlewareHandler<AppBindings>;
 
 export const createRouter = (config: RouterConfig = {}): AppOpenAPI => {
   const { strict = false, defaultHook, includeErrorDetails = true } = config;
