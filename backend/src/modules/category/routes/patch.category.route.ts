@@ -9,7 +9,7 @@ import { requireAuth } from "@/lib/middlewares/auth.middleware";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
 import { auth } from "@/modules/auth/service/auth";
-import { deleteImage } from "@/modules/file/service/delete-image";
+import { deleteImageByIdOrSlug } from "@/modules/file/service/delete-image";
 import { saveSingleImage } from "@/modules/file/service/save-single-img";
 import { moduleTags } from "../../module.tags";
 import { category, categorySchema } from "../entity/category.entity";
@@ -177,19 +177,11 @@ export const PATCH_Handler: AuthenticatedRouteHandler<
   if (!updatedCategory) {
     // If update failed and we uploaded a new image, clean it up
     if (image && image instanceof File && updateData.categoryImgID) {
-      const imageToDelete = await db.query.file.findFirst({
-        where: eq(file.id, updateData.categoryImgID),
-        columns: { slug: true },
-      });
-      if (imageToDelete?.slug) {
-        const deleteResult = await deleteImage(imageToDelete.slug);
-        if (!deleteResult.success) {
-          HONO_LOGGER.error(
-            `Failed to clean up new image ${imageToDelete.slug} after category update failure`,
-            { error: deleteResult.error }
-          );
-        }
-      }
+      await deleteImageByIdOrSlug(
+        updateData.categoryImgID,
+        "id",
+        "after category update failure"
+      );
     }
     return c.json(
       HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to update category"),
@@ -199,14 +191,8 @@ export const PATCH_Handler: AuthenticatedRouteHandler<
 
   // Clean up old image if it was replaced or removed
   if (oldImageSlug) {
-    const deleteResult = await deleteImage(oldImageSlug);
-    if (!deleteResult.success) {
-      HONO_LOGGER.error(
-        `Failed to clean up old image ${oldImageSlug} after category update`,
-        { error: deleteResult.error }
-      );
-      // Don't fail the request, just log the error
-    }
+    await deleteImageByIdOrSlug(oldImageSlug, "slug", "after category update");
+    // Don't fail the request, just log the error
   }
 
   return c.json(

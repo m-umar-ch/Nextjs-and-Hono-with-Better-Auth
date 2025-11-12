@@ -71,6 +71,8 @@ const statement = {
 
   category: ["create", "read", "update", "delete", "list", "reorder"],
 
+  siteConfig: ["create", "read", "update"],
+
   content: [
     "create",
     "read",
@@ -156,6 +158,7 @@ const superAdmin = ac.newRole({
     "track",
   ],
   category: ["create", "read", "update", "delete", "list", "reorder"],
+  siteConfig: ["create", "read", "update"],
   content: [
     "create",
     "read",
@@ -208,6 +211,7 @@ const admin = ac.newRole({
   ],
   order: ["read", "update", "list", "cancel", "fulfill", "refund", "track"],
   category: ["create", "read", "update", "delete", "list", "reorder"],
+  siteConfig: ["create", "read", "update"],
   content: [
     "create",
     "read",

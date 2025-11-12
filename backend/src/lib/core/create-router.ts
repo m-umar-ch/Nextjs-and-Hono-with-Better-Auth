@@ -100,8 +100,11 @@ export interface AuthenticatedAppBindings {
   };
 }
 
-// eslint-disable-next-line ts/no-empty-object-type
 export type AppOpenAPI<S extends Schema = {}> = OpenAPIHono<AppBindings, S>;
+export type AuthenticatedAppOpenAPI<S extends Schema = {}> = OpenAPIHono<
+  AppBindings,
+  S
+>;
 
 export type AppRouteHandler<R extends RouteConfig> = RouteHandler<
   R,
@@ -119,7 +122,7 @@ export type AuthenticatedRouteHandler<R extends RouteConfig> = RouteHandler<
 
 export type AppMiddleware = MiddlewareHandler<AppBindings>;
 
-export const createRouter = (config: RouterConfig = {}): AppOpenAPI => {
+export const createRouter = (config: RouterConfig = {}) => {
   const { strict = false, defaultHook, includeErrorDetails = true } = config;
 
   const hook = defaultHook || createDefaultHook(includeErrorDetails);

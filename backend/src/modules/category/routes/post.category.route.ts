@@ -8,7 +8,7 @@ import { requireAuth } from "@/lib/middlewares/auth.middleware";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
 import { auth } from "@/modules/auth/service/auth";
-import { deleteImage } from "@/modules/file/service/delete-image";
+import { deleteImageByIdOrSlug } from "@/modules/file/service/delete-image";
 import { getSingleImageSchema } from "@/modules/file/service/get-file-openapi.schema";
 import { saveSingleImage } from "@/modules/file/service/save-single-img";
 import { moduleTags } from "../../module.tags";
@@ -118,13 +118,11 @@ export const POST_Handler: AuthenticatedRouteHandler<
   if (!categoryResponse) {
     // Clean up uploaded image if category creation fails
     if (imageResponse.data.slug) {
-      const deleteResult = await deleteImage(imageResponse.data.slug);
-      if (!deleteResult.success) {
-        HONO_LOGGER.error(
-          `Failed to clean up image ${imageResponse.data.slug} after category creation failure`,
-          { error: deleteResult.error }
-        );
-      }
+      await deleteImageByIdOrSlug(
+        imageResponse.data.slug,
+        "slug",
+        "after category creation failure"
+      );
     }
     return c.json(
       HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to create category record"),

@@ -3,13 +3,12 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { file } from "@/db/schema";
 import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
-import { HONO_LOGGER } from "@/lib/core/hono-logger";
 import { HTTP } from "@/lib/http/status-codes";
 import { requireAuth } from "@/lib/middlewares/auth.middleware";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
 import { auth } from "@/modules/auth/service/auth";
-import { deleteImage } from "@/modules/file/service/delete-image";
+import { deleteImageByIdOrSlug } from "@/modules/file/service/delete-image";
 import { moduleTags } from "../../module.tags";
 import { category, categorySchema } from "../entity/category.entity";
 
@@ -94,14 +93,8 @@ export const DELETE_Handler: AuthenticatedRouteHandler<
 
   // Clean up associated image if it exists
   if (imageSlug) {
-    const deleteResult = await deleteImage(imageSlug);
-    if (!deleteResult.success) {
-      HONO_LOGGER.error(
-        `Failed to clean up image ${imageSlug} after category deletion`,
-        { error: deleteResult.error }
-      );
-      // Don't fail the request, just log the error
-    }
+    await deleteImageByIdOrSlug(imageSlug, "slug", "after category deletion");
+    // Don't fail the request, just log the error
   }
 
   return c.json(

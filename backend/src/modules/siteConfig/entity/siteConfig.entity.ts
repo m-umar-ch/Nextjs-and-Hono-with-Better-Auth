@@ -10,6 +10,8 @@ export const siteConfig = createTable(
   "siteConfig",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    siteOwnerEmail: varchar("site_owner_email").notNull(),
+    storeContactEmail: varchar("store_contact_email").notNull(),
     siteLogoId: uuid("site_logo_id").references(() => file.id, {
       onDelete: "set null",
       onUpdate: "cascade",
@@ -25,10 +27,8 @@ export const siteConfig = createTable(
     linkedinUrl: varchar("linkedin_url").default("#"),
     tiktokUrl: varchar("tiktok_url").default("#"),
     youtubeUrl: varchar("youtube_url").default("#"),
-    storeContactEmail: varchar("store_contact_email"),
     storeContactWhatsappNumber: varchar("store_contact_whatsapp_number"),
     footerDescription: varchar("footer_description"),
-    siteOwnerEmail: varchar("site_owner_email"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
