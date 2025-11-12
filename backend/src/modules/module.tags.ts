@@ -4,4 +4,5 @@ export const moduleTags = {
   user: ["User"],
   category: ["Category"],
   file: ["File"],
+  siteConfig: ["SiteConfig"],
 };

@@ -1,13 +1,13 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { fileSchema } from "@/db/schema";
 import type { AppRouteHandler } from "@/lib/core/create-router";
 import { HTTP } from "@/lib/http/status-codes";
-import { APISchema, createResponseSchema } from "@/lib/schemas/api-schemas";
+import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE } from "@/lib/utils";
 import { moduleTags } from "../../module.tags";
-import { category, categorySchema } from "../entity/category.entity";
+import { category } from "../entity/category.entity";
+import { categoryWithImgSchema } from "../schemas/category-with-img.schema";
 
 export const GET_ONE_Route = createRoute({
   path: "/public/category/{slug}",
@@ -15,16 +15,8 @@ export const GET_ONE_Route = createRoute({
   tags: moduleTags.category,
   request: { params: z.object({ slug: z.string().min(1) }) },
   responses: {
-    [HTTP.OK]: createResponseSchema({
-      data: categorySchema.and(
-        z.object({
-          img: fileSchema.nullable(),
-          /**
-           * @todo uncomment this when product modules is completed
-           */
-          // totalProducts: z.number(),
-        })
-      ),
+    [HTTP.OK]: APISchema.response({
+      data: categoryWithImgSchema,
     }),
     [HTTP.NOT_FOUND]: APISchema.NOT_FOUND,
   },

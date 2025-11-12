@@ -1,34 +1,6 @@
-import z from "zod";
+import { z } from "@hono/zod-openapi";
 import { HTTP, HTTP_STATUS_PHRASE } from "../http/status-codes";
 
-export function createResponseSchema<T>({
-  data,
-  description = "OK - Request successful",
-  statusCode = "OK",
-}: {
-  data: T;
-  description?: string;
-  statusCode?: keyof typeof HTTP;
-}) {
-  return {
-    description,
-    content: {
-      "application/json": {
-        schema: z.object({
-          success: z.boolean().default(true),
-          message: z
-            .string()
-            .default(
-              HTTP_STATUS_PHRASE[HTTP[statusCode]] ||
-                "Operation completed successfully"
-            ),
-          statusCode: z.number().optional().default(HTTP[statusCode]),
-          data,
-        }),
-      },
-    },
-  };
-}
 /**
  * Collection of standardized OpenAPI response schemas for HTTP status codes.
  *
@@ -46,9 +18,161 @@ export function createResponseSchema<T>({
  *   }
  * })
  *
+ * // Usage with data response
+ * [HTTP.OK]: APISchema.response({
+ *   data: categorySchema,
+ *   description: "OK - Category retrieved successfully",
+ *   statusCode: "OK",
+ * })
+ *
+ * // Usage with paginated response
+ * [HTTP.OK]: APISchema.paginatedResponse({
+ *   itemSchema: categorySchema,
+ *   description: "OK - Categories retrieved successfully",
+ *   statusCode: "OK",
+ * })
+ *
  * @namespace APISchema
  */
 export const APISchema = {
+  /**
+   * Creates a standardized response schema with data payload.
+   *
+   * Used for successful operations that return data.
+   * Automatically includes success indicator, message, and status code.
+   *
+   * @param options - Configuration object
+   * @param options.data - Zod schema for the response data
+   * @param options.description - Response description (default: "OK - Request successful")
+   * @param options.statusCode - HTTP status code key (default: "OK")
+   * @returns OpenAPI response schema configuration
+   *
+   * @example
+   * APISchema.response({
+   *   data: categorySchema,
+   *   description: "OK - Category retrieved successfully",
+   *   statusCode: "OK",
+   * })
+   */
+  response: <T extends z.ZodType>({
+    data,
+    description = "OK - Request successful",
+    statusCode = "OK",
+  }: {
+    data: T;
+    description?: string;
+    statusCode?: keyof typeof HTTP;
+  }) => {
+    return {
+      description,
+      content: {
+        "application/json": {
+          schema: z.object({
+            success: z.boolean().default(true),
+            message: z
+              .string()
+              .default(
+                HTTP_STATUS_PHRASE[HTTP[statusCode]] ||
+                  "Operation completed successfully"
+              ),
+            statusCode: z.number().optional().default(HTTP[statusCode]),
+            data,
+          }),
+        },
+      },
+    };
+  },
+
+  /**
+   * Creates a standardized paginated response schema.
+   *
+   * Used for list endpoints that return paginated data.
+   * Automatically includes success indicator, message, status code, items array, and pagination metadata.
+   *
+   * @param options - Configuration object
+   * @param options.itemSchema - Zod schema for individual items in the paginated list
+   * @param options.description - Response description (default: "OK - Request successful")
+   * @param options.statusCode - HTTP status code key (default: "OK")
+   * @returns OpenAPI response schema configuration
+   *
+   * @example
+   * APISchema.paginatedResponse({
+   *   itemSchema: categorySchema,
+   *   description: "OK - Categories retrieved successfully",
+   *   statusCode: "OK",
+   * })
+   */
+  paginatedResponse: <T extends z.ZodType>({
+    itemSchema,
+    description = "OK - Request successful",
+    statusCode = "OK",
+  }: {
+    itemSchema: T;
+    description?: string;
+    statusCode?: keyof typeof HTTP;
+  }) => {
+    const paginationSchema = z.object({
+      page: z.number(),
+      limit: z.number(),
+      total: z.number(),
+      totalPages: z.number(),
+      hasNext: z.boolean(),
+      hasPrev: z.boolean(),
+    });
+
+    return {
+      description,
+      content: {
+        "application/json": {
+          schema: z.object({
+            success: z.boolean().default(true),
+            message: z
+              .string()
+              .default(
+                HTTP_STATUS_PHRASE[HTTP[statusCode]] ||
+                  "Operation completed successfully"
+              ),
+            statusCode: z.number().optional().default(HTTP[statusCode]),
+            data: z.object({
+              items: z.array(itemSchema),
+              pagination: paginationSchema,
+            }),
+          }),
+        },
+      },
+    };
+  },
+
+  /**
+   * Pagination query parameters schema for list endpoints.
+   *
+   * Used for paginated GET requests to specify page number and items per page.
+   * Both parameters are optional with sensible defaults.
+   *
+   * @example
+   * // Use defaults (page: 1, limit: 10)
+   * GET /api/categories
+   *
+   * // Specify page and limit
+   * GET /api/categories?page=2&limit=20
+   *
+   * // Usage in route definition
+   * request: {
+   *   query: APISchema.paginationQuery,
+   * }
+   */
+  paginationQuery: z.object({
+    page: z.coerce.number().int().min(1).default(1).nullable().optional(),
+    limit: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(10)
+      .nullable()
+      .optional(),
+  }),
+
   /**
    * HTTP 200 OK - Successful request response schema.
    *
@@ -469,65 +593,4 @@ export const APISchema = {
       },
     },
   },
-};
-
-/**
- * Common Zod schemas for API responses
- */
-export const CommonSchemas = {
-  /**
-   * Standard success response schema
-   */
-  successResponse: z.object({
-    success: z.literal(true),
-    message: z.string(),
-    statusCode: z.number(),
-    timestamp: z.string().optional(),
-    requestId: z.string().optional(),
-  }),
-
-  /**
-   * Standard error response schema
-   */
-  errorResponse: z.object({
-    success: z.literal(false),
-    error: z.object({
-      message: z.string(),
-      issues: z
-        .array(
-          z.object({
-            message: z.string(),
-            path: z.string().optional(),
-            code: z.string().optional(),
-          })
-        )
-        .optional(),
-    }),
-    statusCode: z.number(),
-    timestamp: z.string().optional(),
-    requestId: z.string().optional(),
-  }),
-
-  /**
-   * Paginated response schema
-   */
-  paginatedResponse: <T extends z.ZodType>(itemSchema: T) =>
-    z.object({
-      success: z.literal(true),
-      message: z.string(),
-      statusCode: z.number(),
-      data: z.object({
-        items: z.array(itemSchema),
-        pagination: z.object({
-          page: z.number(),
-          limit: z.number(),
-          total: z.number(),
-          totalPages: z.number(),
-          hasNext: z.boolean(),
-          hasPrev: z.boolean(),
-        }),
-      }),
-      timestamp: z.string().optional(),
-      requestId: z.string().optional(),
-    }),
 };

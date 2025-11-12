@@ -294,6 +294,30 @@ export function HONO_RESPONSE<T>(
 }
 
 /**
+ * Pagination metadata input (allows optional hasNext/hasPrev)
+ */
+interface PaginationInput {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext?: boolean;
+  hasPrev?: boolean;
+}
+
+/**
+ * Pagination metadata output (always has hasNext/hasPrev as boolean)
+ */
+interface PaginationOutput {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+/**
  * Creates a paginated success response for list endpoints
  *
  * @param data - Array of items
@@ -311,21 +335,17 @@ export function HONO_RESPONSE<T>(
  */
 export function HONO_PAGINATED_RESPONSE<T>(
   data: T[],
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext?: boolean;
-    hasPrev?: boolean;
-  },
+  pagination: PaginationInput,
   options: Omit<ResponseOptions, "data"> = {}
 ): SuccessResponse<{
   items: T[];
-  pagination: typeof pagination;
+  pagination: PaginationOutput;
 }> {
-  const paginationData = {
-    ...pagination,
+  const paginationData: PaginationOutput = {
+    page: pagination.page,
+    limit: pagination.limit,
+    total: pagination.total,
+    totalPages: pagination.totalPages,
     hasNext: pagination.hasNext ?? pagination.page < pagination.totalPages,
     hasPrev: pagination.hasPrev ?? pagination.page > 1,
   };

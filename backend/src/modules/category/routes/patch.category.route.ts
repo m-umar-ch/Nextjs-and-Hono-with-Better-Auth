@@ -6,14 +6,14 @@ import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
 import { HONO_LOGGER } from "@/lib/core/hono-logger";
 import { HTTP } from "@/lib/http/status-codes";
 import { requireAuth } from "@/lib/middlewares/auth.middleware";
-import { APISchema, createResponseSchema } from "@/lib/schemas/api-schemas";
+import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
 import { auth } from "@/modules/auth/service/auth";
 import { deleteImage } from "@/modules/file/service/delete-image";
-import { optionalSingleImageSchema } from "@/modules/file/service/get-file-openapi.schema";
 import { saveSingleImage } from "@/modules/file/service/save-single-img";
 import { moduleTags } from "../../module.tags";
 import { category, categorySchema } from "../entity/category.entity";
+import { updateCategorySchema } from "../schemas/update-category.schema";
 
 export const PATCH_Route = createRoute({
   path: "/category/{slug}",
@@ -24,41 +24,7 @@ export const PATCH_Route = createRoute({
     body: {
       content: {
         "multipart/form-data": {
-          schema: z
-            .object({
-              name: z.string().nullable().optional(),
-              slug: z.string().nullable().optional(),
-              image: optionalSingleImageSchema(),
-            })
-            .superRefine(({ name, slug, image }, ctx) => {
-              if (name && name.length < 3) {
-                ctx.addIssue({
-                  code: "custom",
-                  message: "Name must be atleast 3 characters",
-                  path: ["name"],
-                });
-              }
-              if (slug && slug.length < 3) {
-                ctx.addIssue({
-                  code: "custom",
-                  message: "Slug must be atleast 3 characters",
-                  path: ["slug"],
-                });
-              }
-
-              const hasName =
-                name !== null && name !== undefined && name.trim().length > 0;
-              const hasImage = image !== null && image !== undefined;
-              const hasSlug =
-                slug !== null && slug !== undefined && slug.trim().length > 0;
-
-              if (!hasName && !hasImage && !hasSlug) {
-                ctx.addIssue({
-                  code: "custom",
-                  message: "Change name, slug, or image to update",
-                });
-              }
-            }),
+          schema: updateCategorySchema,
         },
       },
       required: true,
@@ -66,7 +32,7 @@ export const PATCH_Route = createRoute({
   },
   middleware: [requireAuth],
   responses: {
-    [HTTP.OK]: createResponseSchema({
+    [HTTP.OK]: APISchema.response({
       data: categorySchema,
       statusCode: "OK",
       description: "OK - Category updated successfully",

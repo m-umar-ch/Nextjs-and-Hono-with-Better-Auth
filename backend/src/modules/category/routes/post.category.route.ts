@@ -5,7 +5,7 @@ import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
 import { HONO_LOGGER } from "@/lib/core/hono-logger";
 import { HTTP } from "@/lib/http/status-codes";
 import { requireAuth } from "@/lib/middlewares/auth.middleware";
-import { APISchema, createResponseSchema } from "@/lib/schemas/api-schemas";
+import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
 import { auth } from "@/modules/auth/service/auth";
 import { deleteImage } from "@/modules/file/service/delete-image";
@@ -34,7 +34,7 @@ export const POST_Route = createRoute({
   },
   middleware: [requireAuth],
   responses: {
-    [HTTP.CREATED]: createResponseSchema({
+    [HTTP.CREATED]: APISchema.response({
       data: categorySchema,
       statusCode: "CREATED",
       description: "CREATED - category",
