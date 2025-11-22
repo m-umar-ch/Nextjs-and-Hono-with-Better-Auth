@@ -1,6 +1,15 @@
 import { z } from "@hono/zod-openapi";
 import { HTTP, HTTP_STATUS_PHRASE } from "../http/status-codes";
 
+export const paginationSchema = z.object({
+  page: z.number(),
+  limit: z.number(),
+  total: z.number(),
+  totalPages: z.number(),
+  hasNext: z.boolean(),
+  hasPrev: z.boolean(),
+});
+
 /**
  * Collection of standardized OpenAPI response schemas for HTTP status codes.
  *
@@ -111,15 +120,6 @@ export const APISchema = {
     description?: string;
     statusCode?: keyof typeof HTTP;
   }) => {
-    const paginationSchema = z.object({
-      page: z.number(),
-      limit: z.number(),
-      total: z.number(),
-      totalPages: z.number(),
-      hasNext: z.boolean(),
-      hasPrev: z.boolean(),
-    });
-
     return {
       description,
       content: {
@@ -145,6 +145,7 @@ export const APISchema = {
 
   /**
    * Pagination query parameters schema for list endpoints.
+   * @caution add max(100) check manually so validation don't fail
    *
    * Used for paginated GET requests to specify page number and items per page.
    * Both parameters are optional with sensible defaults.
@@ -167,10 +168,10 @@ export const APISchema = {
       .number()
       .int()
       .min(1)
-      .max(100)
       .default(10)
       .nullable()
-      .optional(),
+      .optional()
+      .transform((val) => (val && val > 100 ? 100 : val)),
   }),
 
   /**

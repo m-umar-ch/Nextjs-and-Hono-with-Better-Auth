@@ -1,9 +1,10 @@
 "use client";
-import { authClient } from "@/auth/auth-client";
+import { authClient } from "@/auth/auth-client/server";
 import { Button } from "@/components/ui/button";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 const SingInWithGoogle = ({
   className,
@@ -17,12 +18,16 @@ const SingInWithGoogle = ({
     <Button
       variant="outline"
       type="button"
-      onClick={() =>
-        authClient.signIn.social({
-          provider: "google",
-          callbackURL: `${env.NEXT_PUBLIC_FRONTEND_BASE_URL}${safeCallback}`,
-        })
-      }
+      onClick={() => {
+        authClient.signIn
+          .social({
+            provider: "google",
+            callbackURL: `${env.NEXT_PUBLIC_FRONTEND_BASE_URL}${safeCallback}`,
+          })
+          .catch((error) => {
+            toast.error("Something Went Wrong");
+          });
+      }}
       className={cn("cursor-pointer", className)}
       {...props}
     >

@@ -4,10 +4,9 @@ import { db } from "@/db";
 import { file } from "@/db/schema";
 import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
 import { HTTP } from "@/lib/http/status-codes";
-import { requireAuth } from "@/lib/middlewares/auth.middleware";
+import { requirePermissions } from "@/lib/middlewares/auth.middleware";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
-import { auth } from "@/modules/auth/service/auth";
 import { deleteImageByIdOrSlug } from "@/modules/file/service/delete-image";
 import { moduleTags } from "../../module.tags";
 import { category, categorySchema } from "../entity/category.entity";
@@ -16,10 +15,11 @@ export const DELETE_Route = createRoute({
   path: "/category/{slug}",
   method: "delete",
   tags: moduleTags.category,
+  summary: "Delete a category by slug",
   request: {
     params: z.object({ slug: z.string().min(3) }),
   },
-  middleware: [requireAuth],
+  middleware: [requirePermissions({ category: ["delete"] })],
   responses: {
     [HTTP.OK]: APISchema.response({
       data: categorySchema,
@@ -36,23 +36,6 @@ export const DELETE_Route = createRoute({
 export const DELETE_Handler: AuthenticatedRouteHandler<
   typeof DELETE_Route
 > = async (c) => {
-  const hasPermission = await auth.api.userHasPermission({
-    body: {
-      userId: c.var.user.id,
-      permission: { category: ["delete"] },
-    },
-  });
-
-  if (!hasPermission.success) {
-    return c.json(
-      HONO_ERROR(
-        "FORBIDDEN",
-        "You don't have permission to perform this action"
-      ),
-      HTTP.FORBIDDEN
-    );
-  }
-
   const { slug: slugParam } = c.req.valid("param");
   const slug = slugify(slugParam);
 
@@ -61,10 +44,7 @@ export const DELETE_Handler: AuthenticatedRouteHandler<
   });
 
   if (!existingCategory) {
-    return c.json(
-      HONO_ERROR("NOT_FOUND", "Category not found"),
-      HTTP.NOT_FOUND
-    );
+    return HONO_ERROR(c, "NOT_FOUND", "Category not found");
   }
 
   let imageSlug: string | null = null;
@@ -85,10 +65,7 @@ export const DELETE_Handler: AuthenticatedRouteHandler<
     .returning();
 
   if (!deletedCategory) {
-    return c.json(
-      HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to delete category"),
-      HTTP.INTERNAL_SERVER_ERROR
-    );
+    return HONO_ERROR(c, "INTERNAL_SERVER_ERROR", "Failed to delete category");
   }
 
   // Clean up associated image if it exists
@@ -97,8 +74,5 @@ export const DELETE_Handler: AuthenticatedRouteHandler<
     // Don't fail the request, just log the error
   }
 
-  return c.json(
-    HONO_RESPONSE({ data: deletedCategory, statusCode: "OK" }),
-    HTTP.OK
-  );
+  return HONO_RESPONSE(c, { data: deletedCategory, statusCode: "OK" });
 };

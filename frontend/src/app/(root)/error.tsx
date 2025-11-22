@@ -32,7 +32,6 @@ const Error = ({
         <Link
           href={"mailto:ch256.it@gmail.com"}
           className="text-primary underline"
-          prefetch={false}
         >
           here
         </Link>{" "}
@@ -48,9 +47,7 @@ const Error = ({
           Try again
         </Button>
 
-        <Link href={"/"} prefetch={false}>
-          Go to Home
-        </Link>
+        <Link href={"/"}>Go to Home</Link>
       </div>
     </section>
   );

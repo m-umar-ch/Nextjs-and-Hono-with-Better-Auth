@@ -1,0 +1,216 @@
+# Authentication and Authorization Patterns
+
+## Overview
+
+This project uses Better Auth for authentication and a custom permission-based authorization system. All route handlers should use middleware-based permission checks rather than manual permission validation in handlers.
+
+## Middleware-Based Authorization
+
+### `requirePermissions` Middleware
+
+**Always use `requirePermissions` middleware** instead of `requireAuth` + manual permission checks in route handlers.
+
+#### Pattern
+
+```typescript
+import { requirePermissions } from "@/lib/middlewares/auth.middleware";
+
+export const POST_Route = createRoute({
+  // ... route config
+  middleware: [requirePermissions({ order: ["create"] })],
+  // ... responses
+});
+```
+
+#### Benefits
+
+- **Type-safe**: Full IntelliSense support for resource names and actions
+- **DRY**: No repeated permission check code in handlers
+- **Consistent**: All permission checks happen at the middleware level
+- **Clean**: Handlers focus on business logic, not authorization
+
+### Available Resources and Actions
+
+The `requirePermissions` middleware accepts a `PermissionsInput` type that provides IntelliSense for:
+
+- **order**: `["create", "read", "update", "delete", "list", "cancel", "fulfill", "refund", "track"]`
+- **product**: `["create", "read", "update", "delete", "list", "publish", "unpublish", "manage_inventory", "reorder"]`
+- **category**: `["create", "read", "update", "delete", "list", "reorder"]`
+- **siteConfig**: `["create", "read", "update"]`
+- **user**: `["create", "read", "update", "delete", "list", "ban", "unban", "change_role"]`
+- **content**: `["create", "read", "update", "delete", "list", "publish", "unpublish"]`
+- **blog**: `["create", "read", "update", "delete", "list", "publish", "unpublish"]`
+- **discount**: `["create", "read", "update", "delete", "list", "activate", "deactivate"]`
+- **analytics**: `["view_sales", "view_traffic", "view_customers", "view_products", "export_reports"]`
+- **review**: `["create", "read", "update", "delete", "moderate", "respond"]`
+- **coupon**: `["create", "read", "update", "delete", "list", "validate"]`
+- **inventory**: `["view", "update", "track", "alert", "transfer"]`
+- **support**: `["view_tickets", "respond", "escalate", "close", "assign"]`
+- **session**: `["delete", "list", "revoke"]`
+
+### Examples
+
+#### ✅ CORRECT: Using requirePermissions middleware
+
+```typescript
+import { createRoute, z } from "@hono/zod-openapi";
+import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
+import { HTTP } from "@/lib/http/status-codes";
+import { requirePermissions } from "@/lib/middlewares/auth.middleware";
+import { APISchema } from "@/lib/schemas/api-schemas";
+import { HONO_RESPONSE } from "@/lib/utils";
+
+export const POST_Route = createRoute({
+  path: "/order",
+  method: "post",
+  middleware: [requirePermissions({ order: ["create"] })],
+  responses: {
+    [HTTP.OK]: APISchema.OK,
+    [HTTP.FORBIDDEN]: APISchema.FORBIDDEN,
+  },
+});
+
+export const POST_Handler: AuthenticatedRouteHandler<
+  typeof POST_Route
+> = async (c) => {
+  // Handler logic - no permission checks needed!
+  return HONO_RESPONSE(c);
+};
+```
+
+#### ❌ WRONG: Manual permission checks in handler
+
+```typescript
+// ❌ DON'T DO THIS
+export const POST_Route = createRoute({
+  middleware: [requireAuth], // Only checks authentication
+  // ...
+});
+
+export const POST_Handler = async (c) => {
+  // ❌ Manual permission check - should be in middleware
+  const hasPermission = await auth.api.userHasPermission({
+    body: { userId: c.var.user.id, permissions: { order: ["create"] } },
+  });
+  if (!hasPermission.success) {
+    return HONO_ERROR(c, "FORBIDDEN", "You don't have permission");
+  }
+  // Handler logic...
+};
+```
+
+### Multiple Permissions
+
+You can check multiple resources and actions:
+
+```typescript
+middleware: [
+  requirePermissions({
+    product: ["create", "update"],
+    category: ["read"],
+  }),
+],
+```
+
+### Authentication Middleware
+
+#### `requireAuth`
+
+Use `requireAuth` **only** when you need authentication but no specific permissions:
+
+```typescript
+// For routes that only need authentication, not specific permissions
+middleware: [requireAuth],
+```
+
+**Note**: Most routes should use `requirePermissions` instead, as it includes authentication checks.
+
+#### `authMiddleware`
+
+The base `authMiddleware` is applied globally and sets user/session in context. You typically don't need to use it directly in route definitions.
+
+## Route Handler Types
+
+### `AuthenticatedRouteHandler`
+
+Use `AuthenticatedRouteHandler` for routes with `requireAuth` or `requirePermissions` middleware:
+
+```typescript
+export const POST_Handler: AuthenticatedRouteHandler<
+  typeof POST_Route
+> = async (c) => {
+  // c.var.user and c.var.session are guaranteed to be non-null
+  const userId = c.var.user.id;
+  // ...
+};
+```
+
+## Permission Types
+
+The `PermissionsInput` type is exported from `@/modules/auth/service/permissions` and provides full type safety:
+
+```typescript
+import type { PermissionsInput } from "@/modules/auth/service/permissions";
+
+// Type-safe permissions with IntelliSense
+const permissions: PermissionsInput = {
+  order: ["create", "read"],
+  product: ["update"],
+};
+```
+
+## Migration Guide
+
+When updating existing routes:
+
+1. **Replace** `requireAuth` with `requirePermissions({ resource: ["action"] })`
+2. **Remove** all `auth.api.userHasPermission` calls from handlers
+3. **Remove** unused `auth` imports
+4. **Clean up** permission check error handling code
+
+### Before
+
+```typescript
+import { requireAuth } from "@/lib/middlewares/auth.middleware";
+import { auth } from "@/modules/auth/service/auth";
+
+middleware: [requireAuth],
+
+export const Handler = async (c) => {
+  const hasPermission = await auth.api.userHasPermission({
+    body: { userId: c.var.user.id, permissions: { product: ["create"] } },
+  });
+  if (!hasPermission.success) {
+    return HONO_ERROR(c, "FORBIDDEN", "You don't have permission");
+  }
+  // Handler logic...
+};
+```
+
+### After
+
+```typescript
+import { requirePermissions } from "@/lib/middlewares/auth.middleware";
+
+middleware: [requirePermissions({ product: ["create"] })],
+
+export const Handler = async (c) => {
+  // Handler logic - permission already checked!
+};
+```
+
+## Best Practices
+
+1. **Always use `requirePermissions`** for routes that need specific permissions
+2. **Use `requireAuth`** only when authentication is sufficient (rare)
+3. **Never check permissions manually** in route handlers
+4. **Leverage IntelliSense** - the type system will guide you to valid resources and actions
+5. **Keep handlers focused** on business logic, not authorization
+
+## Error Responses
+
+The `requirePermissions` middleware automatically returns:
+- `403 FORBIDDEN` with message "Authentication required" if user is not authenticated
+- `403 FORBIDDEN` with message "You don't have permission to perform this action" if user lacks required permissions
+
+No additional error handling is needed in your handlers.

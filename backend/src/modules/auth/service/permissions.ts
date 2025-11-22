@@ -55,6 +55,7 @@ const statement = {
     "publish",
     "unpublish",
     "manage_inventory",
+    "reorder",
   ],
 
   order: [
@@ -120,6 +121,22 @@ const statement = {
 
 const ac = createAccessControl(statement);
 
+/**
+ * Type representing the permissions structure for type-safe permission checks
+ * Provides IntelliSense for resource names and their available actions
+ *
+ * @example
+ * ```typescript
+ * const permissions: PermissionsInput = {
+ *   order: ["create", "read"],
+ *   product: ["update"]
+ * };
+ * ```
+ */
+export type PermissionsInput = {
+  [K in keyof typeof statement]?: (typeof statement)[K][number][];
+};
+
 // prettier-ignore
 /**
  * SUPER_ADMIN Role - Full system access
@@ -145,6 +162,7 @@ const superAdmin = ac.newRole({
     "publish",
     "unpublish",
     "manage_inventory",
+    "reorder",
   ],
   order: [
     "create",
@@ -203,11 +221,12 @@ const admin = ac.newRole({
     "create",
     "read",
     "update",
-    "delete",
+    // "delete",
     "list",
     "publish",
     "unpublish",
     "manage_inventory",
+    "reorder",
   ],
   order: ["read", "update", "list", "cancel", "fulfill", "refund", "track"],
   category: ["create", "read", "update", "delete", "list", "reorder"],
@@ -271,6 +290,7 @@ const vendor = ac.newRole({
   coupon: ["create", "read", "update", "delete", "list", "validate"], // Own coupons only
   inventory: ["view", "update", "track", "alert"], // Own inventory only
   support: [], // No support permissions
+  siteConfig: ["read"]
 });
 
 // prettier-ignore
@@ -305,6 +325,7 @@ const salesManager = ac.newRole({
   coupon: ["create", "read", "update", "delete", "list", "validate"], // Full coupon management
   inventory: ["view", "track"], // Inventory visibility
   support: ["view_tickets", "respond", "close"], // Customer support
+  siteConfig: ["read"]
 });
 
 // prettier-ignore
@@ -314,7 +335,7 @@ const salesManager = ac.newRole({
  */
 const contentEditor = ac.newRole({
   user: ["read"], // Can only read their own profile
-  product: ["read", "update", "list"], // Can edit product descriptions
+  product: ["read", "update", "list", "reorder"], // Can edit product descriptions
   order: [], // No order permissions
   category: ["create", "read", "update", "list", "reorder"], // Category management
   content: [
@@ -333,6 +354,7 @@ const contentEditor = ac.newRole({
   coupon: [], // No coupon permissions
   inventory: [], // No inventory permissions
   support: [], // No support permissions
+  siteConfig: ["create", "read", "update"]
 });
 
 // prettier-ignore
@@ -353,6 +375,7 @@ const customer = ac.newRole({
   coupon: ["validate"], // Can use coupons
   inventory: [], // No inventory permissions
   support: [], // No support permissions (customers create tickets through other means)
+  siteConfig: ["read"]
 });
 
 enum Roles {

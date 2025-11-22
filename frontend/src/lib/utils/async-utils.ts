@@ -86,7 +86,7 @@ export async function tryCatch<T, E = Error>(
       console.error(
         "⚠️  Connection error detected. This may indicate a service is unavailable."
       );
-      console.error("Error details:", error);
+      // console.error("Error details:", error);
     }
 
     return { data: null, error: error as E, success: false };

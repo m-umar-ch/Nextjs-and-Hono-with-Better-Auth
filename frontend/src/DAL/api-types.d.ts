@@ -92,6 +92,457 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get paginated list of users */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number | null;
+                    limit?: number | null;
+                    search?: string | null;
+                    role?: "superAdmin" | "admin" | "vendor" | "salesManager" | "contentEditor" | "customer" | "customer" | null;
+                    sort?: "name-asc" | "name-desc" | "email-asc" | "email-desc" | "newest" | "oldest" | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Users retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                items: {
+                                    id: string;
+                                    name: string;
+                                    email: string;
+                                    emailVerified: boolean;
+                                    image: string | null;
+                                    role: string;
+                                    banned: boolean | null;
+                                    banReason: string | null;
+                                    /** Format: date */
+                                    banExpires: string | null;
+                                    /** Format: date */
+                                    createdAt: string;
+                                    /** Format: date */
+                                    updatedAt: string;
+                                }[];
+                                pagination: {
+                                    page: number;
+                                    limit: number;
+                                    total: number;
+                                    totalPages: number;
+                                    hasNext: boolean;
+                                    hasPrev: boolean;
+                                };
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single user by email */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    email: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - User retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                id: string;
+                                name: string;
+                                email: string;
+                                emailVerified: boolean;
+                                image: string | null;
+                                role: string;
+                                banned: boolean | null;
+                                banReason: string | null;
+                                /** Format: date */
+                                banExpires: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/{email}/change-role/{role}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change user role */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    email: string;
+                    role: "superAdmin" | "admin" | "vendor" | "salesManager" | "contentEditor" | "customer" | "customer";
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - User role updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                id: string;
+                                name: string;
+                                email: string;
+                                emailVerified: boolean;
+                                image: string | null;
+                                role: string;
+                                banned: boolean | null;
+                                banReason: string | null;
+                                /** Format: date */
+                                banExpires: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/mailer/send": {
         parameters: {
             query?: never;
@@ -196,6 +647,3145 @@ export interface paths {
                                 }[];
                             };
                             /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/category/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a category by slug */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Category deleted successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                slug: string;
+                                sortOrder: number;
+                                /** Format: uuid */
+                                categoryImgID: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** Update a category by slug */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        name?: string | null;
+                        slug?: string | null;
+                        /** Format: binary */
+                        image?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK - Category updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                slug: string;
+                                sortOrder: number;
+                                /** Format: uuid */
+                                categoryImgID: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/public/category/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single category by slug */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Request successful */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                slug: string;
+                                sortOrder: number;
+                                /** Format: uuid */
+                                categoryImgID: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            } & {
+                                img: {
+                                    slug: string;
+                                } | null;
+                                totalProducts: number;
+                            };
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/category": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get paginated list of categories */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number | null;
+                    limit?: number | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Categories retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                items: ({
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                    slug: string;
+                                    sortOrder: number;
+                                    /** Format: uuid */
+                                    categoryImgID: string | null;
+                                    /** Format: date */
+                                    createdAt: string;
+                                    /** Format: date */
+                                    updatedAt: string;
+                                } & {
+                                    img: {
+                                        slug: string;
+                                    } | null;
+                                    totalProducts: number;
+                                })[];
+                                pagination: {
+                                    page: number;
+                                    limit: number;
+                                    total: number;
+                                    totalPages: number;
+                                    hasNext: boolean;
+                                    hasPrev: boolean;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/category": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new category */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        name: string;
+                        slug: string;
+                        /** Format: binary */
+                        image: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description CREATED - category */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Created */
+                            message: string;
+                            /** @default 201 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                slug: string;
+                                sortOrder: number;
+                                /** Format: uuid */
+                                categoryImgID: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/category/sort": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update category sort order */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        sortOrder: number | null;
+                    }[];
+                };
+            };
+            responses: {
+                /** @description OK - Request successful */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Operation completed successfully */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/file/get-img-by-slug/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get image file by slug */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Image filename with extension */
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Image file returned successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "image/png": string;
+                        "image/jpeg": string;
+                        "image/gif": string;
+                        "image/webp": string;
+                        "image/svg+xml": string;
+                        "image/x-icon": string;
+                        "image/bmp": string;
+                        "image/avif": string;
+                        "application/octet-stream": string;
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/site-config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get site configuration */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Site configuration retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                siteOwnerEmail: string;
+                                storeContactEmail: string;
+                                /** Format: uuid */
+                                siteLogoId: string | null;
+                                storeName: string;
+                                storeAddress: string | null;
+                                storeGoogleMapUrl: string | null;
+                                storeGoogleMapIframeUrl: string | null;
+                                facebookUrl: string | null;
+                                instagramUrl: string | null;
+                                linkedinUrl: string | null;
+                                tiktokUrl: string | null;
+                                youtubeUrl: string | null;
+                                storeContactWhatsappNumber: string | null;
+                                footerDescription: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            } & {
+                                siteLogo: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    slug: string;
+                                    /** Format: date */
+                                    createdAt: string;
+                                    /** Format: date */
+                                    updatedAt: string;
+                                } | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/site-config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create site configuration */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        storeName: string;
+                        /** Format: email */
+                        storeContactEmail: string;
+                        /** Format: email */
+                        siteOwnerEmail: string;
+                        storeAddress?: string | null;
+                        /** Format: uri */
+                        storeGoogleMapUrl?: string | null;
+                        /** Format: uri */
+                        storeGoogleMapIframeUrl?: string | null;
+                        /** Format: uri */
+                        facebookUrl?: string | null;
+                        /** Format: uri */
+                        instagramUrl?: string | null;
+                        /** Format: uri */
+                        linkedinUrl?: string | null;
+                        /** Format: uri */
+                        tiktokUrl?: string | null;
+                        /** Format: uri */
+                        youtubeUrl?: string | null;
+                        storeContactWhatsappNumber?: string | null;
+                        footerDescription?: string;
+                        /** Format: binary */
+                        siteLogo?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description CREATED - Site configuration created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Created */
+                            message: string;
+                            /** @default 201 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                siteOwnerEmail: string;
+                                storeContactEmail: string;
+                                /** Format: uuid */
+                                siteLogoId: string | null;
+                                storeName: string;
+                                storeAddress: string | null;
+                                storeGoogleMapUrl: string | null;
+                                storeGoogleMapIframeUrl: string | null;
+                                facebookUrl: string | null;
+                                instagramUrl: string | null;
+                                linkedinUrl: string | null;
+                                tiktokUrl: string | null;
+                                youtubeUrl: string | null;
+                                storeContactWhatsappNumber: string | null;
+                                footerDescription: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Conflict - Resource already exists or state conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Resource conflict occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 409 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update site configuration */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        storeName?: string;
+                        storeAddress?: string | null;
+                        storeGoogleMapUrl?: string | null;
+                        storeGoogleMapIframeUrl?: string | null;
+                        facebookUrl?: string | null;
+                        instagramUrl?: string | null;
+                        linkedinUrl?: string | null;
+                        tiktokUrl?: string | null;
+                        youtubeUrl?: string | null;
+                        /** Format: email */
+                        storeContactEmail?: string | null;
+                        storeContactWhatsappNumber?: string | null;
+                        footerDescription?: string | null;
+                        /** Format: email */
+                        siteOwnerEmail?: string | null;
+                        /** Format: binary */
+                        siteLogo?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK - Site configuration updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                siteOwnerEmail: string;
+                                storeContactEmail: string;
+                                /** Format: uuid */
+                                siteLogoId: string | null;
+                                storeName: string;
+                                storeAddress: string | null;
+                                storeGoogleMapUrl: string | null;
+                                storeGoogleMapIframeUrl: string | null;
+                                facebookUrl: string | null;
+                                instagramUrl: string | null;
+                                linkedinUrl: string | null;
+                                tiktokUrl: string | null;
+                                youtubeUrl: string | null;
+                                storeContactWhatsappNumber: string | null;
+                                footerDescription: string | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/product/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a product by slug */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Product deleted successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                sortOrder: number;
+                                categorySortOrder: number;
+                                name: string;
+                                slug: string;
+                                price: number;
+                                description: string | null;
+                                metaTitle: string | null;
+                                metaDescription: string | null;
+                                categorySlug: string | null;
+                                /** @enum {string|null} */
+                                statusSlug: "active" | "inactive" | "out-of-stock" | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** Update a product by slug */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        name?: string | null;
+                        slug?: string | null;
+                        categorySlug?: string | null;
+                        /** @enum {string|null} */
+                        statusSlug?: "active" | "inactive" | "out-of-stock" | null;
+                        price?: number | null;
+                        description?: string | null;
+                        metatitle?: string | null;
+                        metadescription?: string | null;
+                        imagesToDelete?: string | string[] | unknown;
+                        productImages?: string | (string)[] | unknown;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK - Product updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                sortOrder: number;
+                                categorySortOrder: number;
+                                name: string;
+                                slug: string;
+                                price: number;
+                                description: string | null;
+                                metaTitle: string | null;
+                                metaDescription: string | null;
+                                categorySlug: string | null;
+                                /** @enum {string|null} */
+                                statusSlug: "active" | "inactive" | "out-of-stock" | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/public/product/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single product */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Request successful */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                sortOrder: number;
+                                categorySortOrder: number;
+                                name: string;
+                                slug: string;
+                                price: number;
+                                description: string | null;
+                                metaTitle: string | null;
+                                metaDescription: string | null;
+                                categorySlug: string | null;
+                                /** @enum {string|null} */
+                                statusSlug: "active" | "inactive" | "out-of-stock" | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            } & {
+                                images: {
+                                    sortOrder: number;
+                                    img: {
+                                        slug: string;
+                                    };
+                                }[];
+                            };
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get list of products */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number | null;
+                    limit?: number | null;
+                    search?: string | null;
+                    categorySlug?: string | null;
+                    sort?: "name-asc" | "name-desc" | "price-asc" | "price-desc" | "newest" | "oldest" | "manual" | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Products retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                items: ({
+                                    /** Format: uuid */
+                                    id: string;
+                                    sortOrder: number;
+                                    categorySortOrder: number;
+                                    name: string;
+                                    slug: string;
+                                    price: number;
+                                    description: string | null;
+                                    metaTitle: string | null;
+                                    metaDescription: string | null;
+                                    categorySlug: string | null;
+                                    /** @enum {string|null} */
+                                    statusSlug: "active" | "inactive" | "out-of-stock" | null;
+                                    /** Format: date */
+                                    createdAt: string;
+                                    /** Format: date */
+                                    updatedAt: string;
+                                } & {
+                                    images: {
+                                        sortOrder: number;
+                                        img: {
+                                            slug: string;
+                                        };
+                                    }[];
+                                })[];
+                                pagination: {
+                                    page: number;
+                                    limit: number;
+                                    total: number;
+                                    totalPages: number;
+                                    hasNext: boolean;
+                                    hasPrev: boolean;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new product */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        name: string;
+                        slug: string;
+                        categorySlug: string;
+                        /**
+                         * @default active
+                         * @enum {string}
+                         */
+                        statusSlug?: "active" | "inactive" | "out-of-stock";
+                        price: number | null;
+                        description?: string | null;
+                        metatitle?: string | null;
+                        metadescription?: string | null;
+                        productImages: string | string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description CREATED - Product created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Created */
+                            message: string;
+                            /** @default 201 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                sortOrder: number;
+                                categorySortOrder: number;
+                                name: string;
+                                slug: string;
+                                price: number;
+                                description: string | null;
+                                metaTitle: string | null;
+                                metaDescription: string | null;
+                                categorySlug: string | null;
+                                /** @enum {string|null} */
+                                statusSlug: "active" | "inactive" | "out-of-stock" | null;
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/product/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get products for reorder page */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number | null;
+                    limit?: number | null;
+                    categorySlug?: string | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Request successful */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                category: string;
+                                items: {
+                                    id: string;
+                                    slug: string;
+                                    categorySlug: string | null;
+                                    sortOrder: number;
+                                    categorySortOrder: number;
+                                    name: string;
+                                    images: {
+                                        img: {
+                                            slug: string;
+                                        };
+                                    }[];
+                                }[];
+                                pagination: {
+                                    page: number;
+                                    limit: number;
+                                    total: number;
+                                    totalPages: number;
+                                    hasNext: boolean;
+                                    hasPrev: boolean;
+                                };
+                            };
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Update product sort order */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        products: {
+                            /** Format: uuid */
+                            id: string;
+                            sortOrder: number | null;
+                        }[];
+                        category?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK - Request successful */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Operation completed successfully */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get paginated list of orders */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number | null;
+                    limit?: number | null;
+                    search?: string | null;
+                    orderStatus?: "pending" | "processing" | "shipped" | "delivered" | "cancelled" | null;
+                    sort?: "name-asc" | "name-desc" | "price-asc" | "price-desc" | "newest" | "oldest" | "city-asc" | "city-desc" | "status" | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Orders retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                items: {
+                                    name: string;
+                                    orderNumber: string;
+                                    city: string;
+                                    totalPrice: number;
+                                    discount: number;
+                                    /** @enum {string} */
+                                    status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+                                    /** @enum {string} */
+                                    paymentStatus: "pending" | "paid" | "failed" | "refunded";
+                                }[];
+                                pagination: {
+                                    page: number;
+                                    limit: number;
+                                    total: number;
+                                    totalPages: number;
+                                    hasNext: boolean;
+                                    hasPrev: boolean;
+                                };
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a new order */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        fname: string;
+                        lname: string;
+                        phone: string;
+                        city: string;
+                        address: string;
+                        note?: string | null;
+                        totalPrice: number;
+                        products: {
+                            /** Format: uuid */
+                            id: string;
+                            price: number;
+                            quantity: number;
+                        }[];
+                    };
+                };
+            };
+            responses: {
+                /** @description OK - Order created successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                orderTrackingID: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Bad Request - Invalid request data */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Invalid request parameters provided */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 400 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Unprocessable Entity - Validation errors */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Request validation failed */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 422 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/order/{orderID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single order by ID */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    orderID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Order retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                orderNumber: string;
+                                name: string;
+                                phone: string;
+                                city: string;
+                                shippingAddress: string;
+                                note: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+                                totalPrice: number;
+                                discount: number;
+                                /** @enum {string} */
+                                paymentStatus: "pending" | "paid" | "failed" | "refunded";
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                                userID: string | null;
+                            } & {
+                                orderItems: {
+                                    price: number;
+                                    quantity: number;
+                                    product: {
+                                        name: string;
+                                        slug: string;
+                                        categorySlug: string | null;
+                                        images: {
+                                            img: {
+                                                slug: string;
+                                            };
+                                        }[];
+                                    };
+                                }[];
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Internal Server Error - Server encountered an error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default An unexpected error occurred */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 500 */
+                            statusCode: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/order/change-status/{id}/{status}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change order status */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK - Order status updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default true */
+                            success: boolean;
+                            /** @default Ok */
+                            message: string;
+                            /** @default 200 */
+                            statusCode: number;
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                orderNumber: string;
+                                name: string;
+                                phone: string;
+                                city: string;
+                                shippingAddress: string;
+                                note: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+                                totalPrice: number;
+                                discount: number;
+                                /** @enum {string} */
+                                paymentStatus: "pending" | "paid" | "failed" | "refunded";
+                                /** Format: date */
+                                createdAt: string;
+                                /** Format: date */
+                                updatedAt: string;
+                                userID: string | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized - Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Authentication required */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 401 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Forbidden - Insufficient permissions */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Access denied */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 403 */
+                            statusCode: number;
+                        };
+                    };
+                };
+                /** @description Not Found - Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @default false */
+                            success: boolean;
+                            error: {
+                                /** @default Requested resource not found */
+                                message: string;
+                                issues?: {
+                                    message: string;
+                                    path?: string;
+                                    code?: string;
+                                }[];
+                            };
+                            /** @default 404 */
                             statusCode: number;
                         };
                     };

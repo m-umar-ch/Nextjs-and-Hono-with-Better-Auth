@@ -1,6 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import type { AppRouteHandler } from "@/lib/core/create-router";
+import type {
+  AppRouteHandler,
+  AuthenticatedRouteHandler,
+} from "@/lib/core/create-router";
 import { HTTP } from "@/lib/http/status-codes";
+import { requirePermissions } from "@/lib/middlewares/auth.middleware";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE } from "@/lib/utils";
 import { moduleTags } from "@/modules/module.tags";
@@ -54,6 +58,7 @@ export const POST_Route = createRoute({
   path: "/mailer/send",
   method: "post",
   tags: moduleTags.mailer,
+  summary: "Use Resend Mailers",
   request: {
     body: {
       content: {
@@ -63,7 +68,10 @@ export const POST_Route = createRoute({
       },
     },
   },
-  summary: "Use Resend Mailers",
+  /**
+   * @todo add mailer route
+   */
+  // middleware: [requirePermissions({})],
   responses: {
     [HTTP.OK]: APISchema.OK,
     [HTTP.BAD_REQUEST]: APISchema.BAD_REQUEST,
@@ -72,7 +80,9 @@ export const POST_Route = createRoute({
   },
 });
 
-export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
+export const POST_Handler: AuthenticatedRouteHandler<
+  typeof POST_Route
+> = async (c) => {
   try {
     const emailData = c.req.valid("json");
 
@@ -80,33 +90,25 @@ export const POST_Handler: AppRouteHandler<typeof POST_Route> = async (c) => {
     const result = await sendEmail(emailData);
 
     if (!result.success) {
-      return c.json(
-        HONO_ERROR("BAD_REQUEST", "Failed to send email", {
-          issues: [{ message: result.error || "Unknown error occurred" }],
-        }),
-        HTTP.BAD_REQUEST
-      );
+      return HONO_ERROR(c, "BAD_REQUEST", "Failed to send email", {
+        issues: [{ message: result.error || "Unknown error occurred" }],
+      });
     }
 
-    return c.json(
-      HONO_RESPONSE({
-        message: "Email sent successfully",
-        data: result.data,
-      }),
-      HTTP.OK
-    );
+    return HONO_RESPONSE(c, {
+      message: "Email sent successfully",
+      data: result.data,
+      statusCode: "OK",
+    });
   } catch (error) {
-    return c.json(
-      HONO_ERROR("INTERNAL_SERVER_ERROR", "Internal server error", {
-        issues: [
-          {
-            message:
-              error instanceof Error ? error.message : "Unknown error occurred",
-          },
-        ],
-        error,
-      }),
-      HTTP.INTERNAL_SERVER_ERROR
-    );
+    return HONO_ERROR(c, "INTERNAL_SERVER_ERROR", "Internal server error", {
+      issues: [
+        {
+          message:
+            error instanceof Error ? error.message : "Unknown error occurred",
+        },
+      ],
+      error,
+    });
   }
 };

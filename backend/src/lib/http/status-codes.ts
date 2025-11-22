@@ -48,6 +48,12 @@ export const HTTP = {
    */
   FAILED_DEPENDENCY: 424,
   /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc8470#section-5.2
+   *
+   * Indicates that the server is unwilling to risk processing a request that might be replayed.
+   */
+  TOO_EARLY: 425,
+  /**
    * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.5.3
    *
    * The client does not have access rights to the content, i.e. they are unauthorized, so server is rejecting to give proper response. Unlike 401, the client's identity is known to the server.
@@ -72,17 +78,23 @@ export const HTTP = {
    */
   HTTP_VERSION_NOT_SUPPORTED: 505,
   /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc2295#section-8.1
+   *
+   * The server has an internal configuration error: the chosen variant resource is configured to engage in transparent content negotiation itself, and is therefore not a proper end point in the negotiation process.
+   */
+  VARIANT_ALSO_NEGOTIATES: 506,
+  /**
    * Official Documentation @ https://tools.ietf.org/html/rfc2324#section-2.3.2
    *
    * Any attempt to brew coffee with a teapot should result in the error code "418 I'm a teapot". The resulting entity body MAY be short and stout.
    */
   IM_A_TEAPOT: 418,
   /**
-   * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.6
+   * Official Documentation @ https://tools.ietf.org/html/rfc3229#section-10.4.1
    *
-   * The 507 (Insufficient Storage) status code means the method could not be performed on the resource because the server is unable to store the representation needed to successfully complete the request. This condition is considered to be temporary. If the request which received this status code was the result of a user action, the request MUST NOT be repeated until it is requested by a separate user action.
+   * The server has fulfilled a GET request for the resource, and the response is a representation of the result of one or more instance-manipulations applied to the current instance.
    */
-  INSUFFICIENT_SPACE_ON_RESOURCE: 419,
+  IM_USED: 226,
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.6
    *
@@ -108,12 +120,11 @@ export const HTTP = {
    */
   LOCKED: 423,
   /**
-   * @deprecated
-   * Official Documentation @ https://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt
+   * Official Documentation @ https://tools.ietf.org/html/rfc5842#section-7.2
    *
-   * A deprecated response used by the Spring Framework when a method has failed.
+   * The server terminated an operation because it encountered an infinite loop while processing a request with "Depth: infinity".
    */
-  METHOD_FAILURE: 420,
+  LOOP_DETECTED: 508,
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.5.5
    *
@@ -132,6 +143,12 @@ export const HTTP = {
    * This response code means that URI of requested resource has been changed temporarily. New changes in the URI might be made in the future. Therefore, this same URI should be used by the client in future requests.
    */
   MOVED_TEMPORARILY: 302,
+  /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc5842#section-7.1
+   *
+   * The members of a DAV binding have already been enumerated in a preceding part of the (multistatus) response, and are not being included again.
+   */
+  ALREADY_USED: 208,
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.2
    *
@@ -186,6 +203,12 @@ export const HTTP = {
    * This is used for caching purposes. It is telling to client that response has not been modified. So, client can continue to use same cached version of response.
    */
   NOT_MODIFIED: 304,
+  /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc2774#section-7
+   *
+   * Further extensions to the request are required for the server to fulfill it.
+   */
+  NOT_EXTENDED: 510,
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.3.1
    *
@@ -348,6 +371,13 @@ export const HTTP = {
    */
   USE_PROXY: 305,
   /**
+   * @deprecated
+   * Official Documentation @ https://tools.ietf.org/html/rfc2616#section-10.3.7
+   *
+   * No longer used. The 306 status code was used in a previous version of the specification, is no longer used, and the code is reserved.
+   */
+  SWITCH_PROXY: 306,
+  /**
    * Official Documentation @ https://datatracker.ietf.org/doc/html/rfc7540#section-9.1.2
    *
    * Defined in the specification of HTTP/2 to indicate that a server is not able to produce a response for the combination of scheme and authority that are included in the request URI.
@@ -405,6 +435,12 @@ export const HTTP_STATUS_PHRASE = {
    */
   424: "Failed Dependency",
   /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc8470#section-5.2
+   *
+   * Indicates that the server is unwilling to risk processing a request that might be replayed.
+   */
+  425: "Too Early",
+  /**
    * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.5.3
    *
    * The client does not have access rights to the content, i.e. they are unauthorized, so server is rejecting to give proper response. Unlike 401, the client's identity is known to the server.
@@ -429,17 +465,17 @@ export const HTTP_STATUS_PHRASE = {
    */
   505: "Http Version Not Supported",
   /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc2295#section-8.1
+   *
+   * The server has an internal configuration error: the chosen variant resource is configured to engage in transparent content negotiation itself, and is therefore not a proper end point in the negotiation process.
+   */
+  506: "Variant Also Negotiates",
+  /**
    * Official Documentation @ https://tools.ietf.org/html/rfc2324#section-2.3.2
    *
    * Any attempt to brew coffee with a teapot should result in the error code "418 I'm a teapot". The resulting entity body MAY be short and stout.
    */
   418: "Im A Teapot",
-  /**
-   * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.6
-   *
-   * The 507 (Insufficient Storage) status code means the method could not be performed on the resource because the server is unable to store the representation needed to successfully complete the request. This condition is considered to be temporary. If the request which received this status code was the result of a user action, the request MUST NOT be repeated until it is requested by a separate user action.
-   */
-  419: "Insufficient Space On Resource",
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.6
    *
@@ -465,12 +501,11 @@ export const HTTP_STATUS_PHRASE = {
    */
   423: "Locked",
   /**
-   * @deprecated
-   * Official Documentation @ https://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt
+   * Official Documentation @ https://tools.ietf.org/html/rfc5842#section-7.2
    *
-   * A deprecated response used by the Spring Framework when a method has failed.
+   * The server terminated an operation because it encountered an infinite loop while processing a request with "Depth: infinity".
    */
-  420: "Method Failure",
+  508: "Loop Detected",
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.5.5
    *
@@ -489,6 +524,12 @@ export const HTTP_STATUS_PHRASE = {
    * This response code means that URI of requested resource has been changed temporarily. New changes in the URI might be made in the future. Therefore, this same URI should be used by the client in future requests.
    */
   302: "Moved Temporarily",
+  /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc5842#section-7.1
+   *
+   * The members of a DAV binding have already been enumerated in a preceding part of the (multistatus) response, and are not being included again.
+   */
+  208: "Already Used",
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.2
    *
@@ -544,6 +585,12 @@ export const HTTP_STATUS_PHRASE = {
    */
   304: "Not Modified",
   /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc2774#section-7
+   *
+   * Further extensions to the request are required for the server to fulfill it.
+   */
+  510: "Not Extended",
+  /**
    * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.3.1
    *
    * The request has succeeded. The meaning of a success varies depending on the HTTP method:
@@ -559,6 +606,12 @@ export const HTTP_STATUS_PHRASE = {
    * This response code is used because of range header sent by the client to separate download into multiple streams.
    */
   206: "Partial Content",
+  /**
+   * Official Documentation @ https://tools.ietf.org/html/rfc3229#section-10.4.1
+   *
+   * The server has fulfilled a GET request for the resource, and the response is a representation of the result of one or more instance-manipulations applied to the current instance.
+   */
+  226: "Im Used",
   /**
    * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.5.2
    *
@@ -705,6 +758,13 @@ export const HTTP_STATUS_PHRASE = {
    */
   305: "Use Proxy",
   /**
+   * @deprecated
+   * Official Documentation @ https://tools.ietf.org/html/rfc2616#section-10.3.7
+   *
+   * No longer used. The 306 status code was used in a previous version of the specification, is no longer used, and the code is reserved.
+   */
+  306: "Switch Proxy",
+  /**
    * Official Documentation @ https://datatracker.ietf.org/doc/html/rfc7540#section-9.1.2
    *
    * Defined in the specification of HTTP/2 to indicate that a server is not able to produce a response for the combination of scheme and authority that are included in the request URI.
@@ -720,6 +780,12 @@ export const HTTP_STATUS_PHRASE = {
  * The request has been received but not yet acted upon. It is non-committal, meaning that there is no way in HTTP to later send an asynchronous response indicating the outcome of processing the request. It is intended for cases where another process or server handles the request, or for batch processing.
  */
 export const ACCEPTED = 202;
+/**
+ * Official Documentation @ https://tools.ietf.org/html/rfc5842#section-7.1
+ *
+ * The members of a DAV binding have already been enumerated in a preceding part of the (multistatus) response, and are not being included again.
+ */
+export const ALREADY_USED = 208;
 /**
  * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.6.3
  *
@@ -793,11 +859,11 @@ export const HTTP_VERSION_NOT_SUPPORTED = 505;
  */
 export const IM_A_TEAPOT = 418;
 /**
- * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.6
+ * Official Documentation @ https://tools.ietf.org/html/rfc3229#section-10.4.1
  *
- * The 507 (Insufficient Storage) status code means the method could not be performed on the resource because the server is unable to store the representation needed to successfully complete the request. This condition is considered to be temporary. If the request which received this status code was the result of a user action, the request MUST NOT be repeated until it is requested by a separate user action.
+ * The server has fulfilled a GET request for the resource, and the response is a representation of the result of one or more instance-manipulations applied to the current instance.
  */
-export const INSUFFICIENT_SPACE_ON_RESOURCE = 419;
+export const IM_USED = 226;
 /**
  * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.6
  *
@@ -823,12 +889,11 @@ export const LENGTH_REQUIRED = 411;
  */
 export const LOCKED = 423;
 /**
- * @deprecated
- * Official Documentation @ https://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt
+ * Official Documentation @ https://tools.ietf.org/html/rfc5842#section-7.2
  *
- * A deprecated response used by the Spring Framework when a method has failed.
+ * The server terminated an operation because it encountered an infinite loop while processing a request with "Depth: infinity".
  */
-export const METHOD_FAILURE = 420;
+export const LOOP_DETECTED = 508;
 /**
  * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.5.5
  *
@@ -901,6 +966,12 @@ export const NOT_IMPLEMENTED = 501;
  * This is used for caching purposes. It is telling to client that response has not been modified. So, client can continue to use same cached version of response.
  */
 export const NOT_MODIFIED = 304;
+/**
+ * Official Documentation @ https://tools.ietf.org/html/rfc2774#section-7
+ *
+ * Further extensions to the request are required for the server to fulfill it.
+ */
+export const NOT_EXTENDED = 510;
 /**
  * Official Documentation @ https://tools.ietf.org/html/rfc7231#section-6.3.1
  *
@@ -1032,6 +1103,12 @@ export const TEMPORARY_REDIRECT = 307;
  */
 export const TOO_MANY_REQUESTS = 429;
 /**
+ * Official Documentation @ https://tools.ietf.org/html/rfc8470#section-5.2
+ *
+ * Indicates that the server is unwilling to risk processing a request that might be replayed.
+ */
+export const TOO_EARLY = 425;
+/**
  * Official Documentation @ https://tools.ietf.org/html/rfc7235#section-3.1
  *
  * Although the HTTP standard specifies "unauthorized", semantically this response means "unauthenticated". That is, the client must authenticate itself to get the requested response.
@@ -1043,6 +1120,12 @@ export const UNAUTHORIZED = 401;
  * The user-agent requested a resource that cannot legally be provided, such as a web page censored by a government.
  */
 export const UNAVAILABLE_FOR_LEGAL_REASONS = 451;
+/**
+ * Official Documentation @ https://tools.ietf.org/html/rfc2295#section-8.1
+ *
+ * The server has an internal configuration error: the chosen variant resource is configured to engage in transparent content negotiation itself, and is therefore not a proper end point in the negotiation process.
+ */
+export const VARIANT_ALSO_NEGOTIATES = 506;
 /**
  * Official Documentation @ https://tools.ietf.org/html/rfc2518#section-10.3
  *
@@ -1062,6 +1145,13 @@ export const UNSUPPORTED_MEDIA_TYPE = 415;
  * Was defined in a previous version of the HTTP specification to indicate that a requested response must be accessed by a proxy. It has been deprecated due to security concerns regarding in-band configuration of a proxy.
  */
 export const USE_PROXY = 305;
+/**
+ * @deprecated
+ * Official Documentation @ https://tools.ietf.org/html/rfc2616#section-10.3.7
+ *
+ * No longer used. The 306 status code was used in a previous version of the specification, is no longer used, and the code is reserved.
+ */
+export const SWITCH_PROXY = 306;
 /**
  * Official Documentation @ https://datatracker.ietf.org/doc/html/rfc7540#section-9.1.2
  *

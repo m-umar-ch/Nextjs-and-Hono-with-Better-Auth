@@ -11,6 +11,7 @@ export const GET_IMG_Route = createRoute({
   path: "/public/file/get-img-by-slug/{slug}",
   method: "get",
   tags: moduleTags.file,
+  summary: "Get image file by slug",
   request: {
     params: z.object({
       slug: z
@@ -35,17 +36,14 @@ export const GET_IMG_Handler: AppRouteHandler<typeof GET_IMG_Route> = async (
   // Sanitize and validate file path
   const filePath = sanitizeFilePath(slug);
   if (!filePath) {
-    return c.json(
-      HONO_ERROR("BAD_REQUEST", "Invalid file path"),
-      HTTP.BAD_REQUEST
-    );
+    return HONO_ERROR(c, "BAD_REQUEST", "Invalid file path");
   }
 
   try {
     const fileStats = await stat(filePath);
 
     if (!fileStats.isFile()) {
-      return c.json(HONO_ERROR("NOT_FOUND"), HTTP.NOT_FOUND);
+      return HONO_ERROR(c, "NOT_FOUND");
     }
 
     // Use Bun's optimized file reading
@@ -64,14 +62,14 @@ export const GET_IMG_Handler: AppRouteHandler<typeof GET_IMG_Route> = async (
   } catch (error) {
     if (error && typeof error === "object" && "code" in error) {
       if (error.code === "ENOENT") {
-        return c.json(HONO_ERROR("NOT_FOUND"), HTTP.NOT_FOUND);
+        return HONO_ERROR(c, "NOT_FOUND");
       }
       if (error.code === "EACCES" || error.code === "EPERM") {
-        return c.json(HONO_ERROR("FORBIDDEN", "Access denied"), HTTP.FORBIDDEN);
+        return HONO_ERROR(c, "FORBIDDEN", "Access denied");
       }
     }
 
     console.error(`Error serving image ${slug}:`, error);
-    return c.json(HONO_ERROR("NOT_FOUND"), HTTP.NOT_FOUND);
+    return HONO_ERROR(c, "NOT_FOUND");
   }
 };

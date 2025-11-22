@@ -58,7 +58,7 @@ export function createNotFoundHandler(
       customMessage ||
       `The requested resource '${requestedPath}' was not found`;
 
-    return c.json(HONO_ERROR("NOT_FOUND", message, { requestId }), 404);
+    return HONO_ERROR(c, "NOT_FOUND", message, { requestId });
   };
 }
 

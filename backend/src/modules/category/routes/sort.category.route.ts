@@ -4,10 +4,9 @@ import { db } from "@/db";
 import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
 import { HONO_LOGGER } from "@/lib/core/hono-logger";
 import { HTTP } from "@/lib/http/status-codes";
-import { requireAuth } from "@/lib/middlewares/auth.middleware";
+import { requirePermissions } from "@/lib/middlewares/auth.middleware";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE } from "@/lib/utils";
-import { auth } from "@/modules/auth/service/auth";
 import { moduleTags } from "../../module.tags";
 import { category } from "../entity/category.entity";
 
@@ -15,6 +14,7 @@ export const SORT_Route = createRoute({
   path: "/category/sort",
   method: "post",
   tags: moduleTags.category,
+  summary: "Update category sort order",
   request: {
     body: {
       content: {
@@ -27,7 +27,7 @@ export const SORT_Route = createRoute({
                   .number()
                   .int()
                   .min(0, "Sort order must be non-negative"),
-              })
+              }),
             )
             .min(1, "At least one category must be provided"),
         },
@@ -35,7 +35,7 @@ export const SORT_Route = createRoute({
       required: true,
     },
   },
-  middleware: [requireAuth],
+  middleware: [requirePermissions({ category: ["update"] })],
   responses: {
     [HTTP.OK]: APISchema.OK,
     [HTTP.BAD_REQUEST]: APISchema.BAD_REQUEST,
@@ -49,23 +49,6 @@ export const SORT_Route = createRoute({
 export const SORT_Handler: AuthenticatedRouteHandler<
   typeof SORT_Route
 > = async (c) => {
-  const hasPermission = await auth.api.userHasPermission({
-    body: {
-      userId: c.var.user.id,
-      permission: { category: ["update"] },
-    },
-  });
-
-  if (!hasPermission.success) {
-    return c.json(
-      HONO_ERROR(
-        "FORBIDDEN",
-        "You don't have permission to perform this action"
-      ),
-      HTTP.FORBIDDEN
-    );
-  }
-
   const categoriesToUpdate = c.req.valid("json");
 
   // Validate that all category IDs exist
@@ -79,12 +62,10 @@ export const SORT_Handler: AuthenticatedRouteHandler<
   const invalidIds = categoryIds.filter((id) => !existingIds.has(id));
 
   if (invalidIds.length > 0) {
-    return c.json(
-      HONO_ERROR(
-        "BAD_REQUEST",
-        `Invalid category IDs: ${invalidIds.join(", ")}`
-      ),
-      HTTP.BAD_REQUEST
+    return HONO_ERROR(
+      c,
+      "BAD_REQUEST",
+      `Invalid category IDs: ${invalidIds.join(", ")}`,
     );
   }
 
@@ -95,28 +76,23 @@ export const SORT_Handler: AuthenticatedRouteHandler<
           tx
             .update(category)
             .set({ sortOrder: item.sortOrder })
-            .where(eq(category.id, item.id))
-        )
+            .where(eq(category.id, item.id)),
+        ),
       );
     });
 
-    return c.json(
-      HONO_RESPONSE({
-        message: "Category sort order updated successfully",
-      }),
-      HTTP.OK
-    );
+    return HONO_RESPONSE(c, {
+      message: "Category sort order updated successfully",
+    });
   } catch (error) {
     HONO_LOGGER.error("Failed to update category sort order", {
       error,
       categoryIds,
     });
-    return c.json(
-      HONO_ERROR(
-        "INTERNAL_SERVER_ERROR",
-        "Failed to update category sort order"
-      ),
-      HTTP.INTERNAL_SERVER_ERROR
+    return HONO_ERROR(
+      c,
+      "INTERNAL_SERVER_ERROR",
+      "Failed to update category sort order",
     );
   }
 };

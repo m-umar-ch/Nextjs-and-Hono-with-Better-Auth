@@ -33,7 +33,7 @@ const SENTRY_LEVELS = {
 /**
  * Type for structured log context data
  */
-type LogContext = Record<string, any>;
+type LogContext = Record<string, unknown>;
 
 /**
  * Formats an object for pretty console output
@@ -425,7 +425,7 @@ export const HONO_LOGGER = {
      */
     captureException: (
       error: Error | unknown,
-      context?: Record<string, any>
+      context?: Record<string, unknown>
     ) => {
       const logId = nanoid();
 
@@ -453,7 +453,7 @@ export const HONO_LOGGER = {
      * });
      * ```
      */
-    setContext: (key: string, context: Record<string, any>) => {
+    setContext: (key: string, context: Record<string, unknown>) => {
       if (env.SENTRY_ENABLED) {
         Sentry.setContext(key, context);
       }
@@ -517,7 +517,7 @@ export const HONO_LOGGER = {
     captureMessage: (
       message: string,
       level: "debug" | "info" | "warning" | "error" | "fatal" = "info",
-      extra?: Record<string, any>
+      extra?: Record<string, unknown>
     ) => {
       const logId = nanoid();
 
@@ -552,7 +552,7 @@ export const HONO_LOGGER = {
       message: string,
       category = "custom",
       level: "debug" | "info" | "warning" | "error" | "fatal" = "info",
-      data?: Record<string, any>
+      data?: Record<string, unknown>
     ) => {
       if (env.SENTRY_ENABLED) {
         Sentry.addBreadcrumb({

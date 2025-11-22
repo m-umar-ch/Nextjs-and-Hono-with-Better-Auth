@@ -68,6 +68,20 @@ This project follows NestJS-inspired naming conventions and patterns while using
 - Integrate with Sentry for production monitoring
 - Follow appropriate log levels
 
+### 5. [Authentication & Authorization Patterns](./rules/auth-patterns.mdc)
+
+- Middleware-based permission checking
+- Type-safe permission definitions
+- Better Auth integration
+- Route handler authorization patterns
+
+**Key Points:**
+
+- Always use `requirePermissions` middleware instead of manual checks
+- Use `requireAuth` only when authentication is sufficient
+- Never check permissions manually in route handlers
+- Leverage IntelliSense for type-safe permissions
+
 ## Project Structure
 
 ```
@@ -161,31 +175,67 @@ src/
 ### Route Handler Template
 
 ```typescript
-import { RouteHandler } from "@hono/zod-openapi";
-import { tryCatch } from "@/lib/utils";
-import { HONO_RESPONSE, HONO_ERROR } from "@/lib/utils/response-utils";
-import { HONO_LOGGER } from "@/lib/core/hono-logger";
+import { createRoute, z } from "@hono/zod-openapi";
+import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
 import { HTTP } from "@/lib/http/status-codes";
+import { requirePermissions } from "@/lib/middlewares/auth.middleware";
+import { APISchema } from "@/lib/schemas/api-schemas";
+import { HONO_RESPONSE, HONO_ERROR } from "@/lib/utils";
+import { tryCatch } from "@/lib/utils";
+import { HONO_LOGGER } from "@/lib/core/hono-logger";
 
-export const handler: RouteHandler = async (c) => {
+export const POST_Route = createRoute({
+  path: "/resource",
+  method: "post",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            // Your schema here
+          }),
+        },
+      },
+    },
+  },
+  middleware: [requirePermissions({ resource: ["create"] })],
+  responses: {
+    [HTTP.CREATED]: APISchema.response({
+      data: YourSchema,
+      statusCode: "CREATED",
+    }),
+    [HTTP.FORBIDDEN]: APISchema.FORBIDDEN,
+    [HTTP.INTERNAL_SERVER_ERROR]: APISchema.INTERNAL_SERVER_ERROR,
+  },
+});
+
+export const POST_Handler: AuthenticatedRouteHandler<
+  typeof POST_Route
+> = async (c) => {
   const requestId = c.get("requestId");
+  const body = c.req.valid("json");
 
   HONO_LOGGER.log("Operation started", { requestId });
 
   const { data: result, error } = await tryCatch(
-    SomeService.performOperation()
+    SomeService.performOperation(body)
   );
 
   if (error) {
-    HONO_LOGGER.error("Operation failed", { requestId, error: error.message });
-    return c.json(
-      HONO_ERROR("INTERNAL_SERVER_ERROR", error.message),
-      HTTP.INTERNAL_SERVER_ERROR
+    HONO_LOGGER.error("Operation failed", { requestId, error });
+    return HONO_ERROR(
+      c,
+      "INTERNAL_SERVER_ERROR",
+      "Operation failed. Please try again."
     );
   }
 
-  HONO_LOGGER.log("Operation completed", { requestId, result });
-  return c.json(HONO_RESPONSE({ data: result }), HTTP.OK);
+  HONO_LOGGER.log("Operation completed", { requestId });
+  return HONO_RESPONSE(c, {
+    data: result,
+    statusCode: "CREATED",
+    message: "Resource created successfully",
+  });
 };
 ```
 
@@ -251,7 +301,9 @@ export class ModuleService {
 
 - Never log sensitive information
 - Validate all inputs
-- Use proper authentication/authorization
+- **Always use `requirePermissions` middleware** for route authorization (see [Auth Patterns](./rules/auth-patterns.mdc))
+- Use `requireAuth` only when authentication is sufficient (rare)
+- Never check permissions manually in route handlers
 - Implement rate limiting
 - Follow OWASP guidelines
 

@@ -11,7 +11,7 @@ import z from "zod";
 import { useAppForm } from "@/components/common/form/hooks";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { authClient } from "@/auth/auth-client";
+import { authClient } from "@/auth/auth-client/server";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { delayIfDev } from "@/lib/utils/development-delay";
@@ -97,14 +97,14 @@ const EmailLoginForm = ({
               onSuccess() {
                 toast.success(`Successfully Logged In as ${value.email}`);
                 router.push(
-                  `${env.NEXT_PUBLIC_FRONTEND_BASE_URL}${safeCallback}`
+                  `${env.NEXT_PUBLIC_FRONTEND_BASE_URL}${safeCallback}` as never,
                 );
               },
               onError(error) {
                 toast.error(error?.message || "Something Went Wrong");
                 toast.info("Try Login With Google");
               },
-            }
+            },
           );
         }
       }
@@ -138,7 +138,7 @@ const EmailLoginForm = ({
                         One-Time Password
                       </FieldLabel>
                       <p
-                        className="ml-auto text-sm underline-offset-4 hover:underline text-destructive cursor-pointer"
+                        className="text-destructive ml-auto cursor-pointer text-sm underline-offset-4 hover:underline"
                         onClick={() => setIsOTPView(null)}
                       >
                         Resend OTP

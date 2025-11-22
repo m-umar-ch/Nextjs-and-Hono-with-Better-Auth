@@ -5,10 +5,9 @@ import { file } from "@/db/schema";
 import type { AuthenticatedRouteHandler } from "@/lib/core/create-router";
 import { HONO_LOGGER } from "@/lib/core/hono-logger";
 import { HTTP } from "@/lib/http/status-codes";
-import { requireAuth } from "@/lib/middlewares/auth.middleware";
+import { requirePermissions } from "@/lib/middlewares/auth.middleware";
 import { APISchema } from "@/lib/schemas/api-schemas";
 import { HONO_ERROR, HONO_RESPONSE, slugify } from "@/lib/utils";
-import { auth } from "@/modules/auth/service/auth";
 import { deleteImageByIdOrSlug } from "@/modules/file/service/delete-image";
 import { saveSingleImage } from "@/modules/file/service/save-single-img";
 import { moduleTags } from "../../module.tags";
@@ -19,6 +18,7 @@ export const PATCH_Route = createRoute({
   path: "/category/{slug}",
   method: "patch",
   tags: moduleTags.category,
+  summary: "Update a category by slug",
   request: {
     params: z.object({ slug: z.string().min(3) }),
     body: {
@@ -30,7 +30,7 @@ export const PATCH_Route = createRoute({
       required: true,
     },
   },
-  middleware: [requireAuth],
+  middleware: [requirePermissions({ category: ["update"] })],
   responses: {
     [HTTP.OK]: APISchema.response({
       data: categorySchema,
@@ -49,23 +49,6 @@ export const PATCH_Route = createRoute({
 export const PATCH_Handler: AuthenticatedRouteHandler<
   typeof PATCH_Route
 > = async (c) => {
-  const hasPermission = await auth.api.userHasPermission({
-    body: {
-      userId: c.var.user.id,
-      permission: { category: ["update"] },
-    },
-  });
-
-  if (!hasPermission.success) {
-    return c.json(
-      HONO_ERROR(
-        "FORBIDDEN",
-        "You don't have permission to perform this action"
-      ),
-      HTTP.FORBIDDEN
-    );
-  }
-
   const { slug: currentSlugParam } = c.req.valid("param");
   const currentSlug = slugify(currentSlugParam);
 
@@ -78,10 +61,7 @@ export const PATCH_Handler: AuthenticatedRouteHandler<
   });
 
   if (!existingCategory) {
-    return c.json(
-      HONO_ERROR("NOT_FOUND", "Category not found"),
-      HTTP.NOT_FOUND
-    );
+    return HONO_ERROR(c, "NOT_FOUND", "Category not found");
   }
 
   const updateData: {
@@ -96,9 +76,10 @@ export const PATCH_Handler: AuthenticatedRouteHandler<
     });
 
     if (slugExists) {
-      return c.json(
-        HONO_ERROR("UNPROCESSABLE_ENTITY", "Category slug already exists"),
-        HTTP.UNPROCESSABLE_ENTITY
+      return HONO_ERROR(
+        c,
+        "UNPROCESSABLE_ENTITY",
+        "Category slug already exists",
       );
     }
 
@@ -138,14 +119,12 @@ export const PATCH_Handler: AuthenticatedRouteHandler<
       HONO_LOGGER.error(`Image upload failed for ${image.name}`, {
         error: imageResponse.error,
       });
-      return c.json(
-        HONO_ERROR(
-          "INTERNAL_SERVER_ERROR",
-          `Failed to upload image: ${
-            imageResponse.error?.message || "Unknown error"
-          }`
-        ),
-        HTTP.INTERNAL_SERVER_ERROR
+      return HONO_ERROR(
+        c,
+        "INTERNAL_SERVER_ERROR",
+        `Failed to upload image: ${
+          imageResponse.error?.message || "Unknown error"
+        }`,
       );
     }
 
@@ -159,12 +138,10 @@ export const PATCH_Handler: AuthenticatedRouteHandler<
 
   // Ensure at least one field is being updated
   if (Object.keys(updateData).length === 0) {
-    return c.json(
-      HONO_ERROR(
-        "BAD_REQUEST",
-        "At least one field (name, slug, or image) must be provided for update"
-      ),
-      HTTP.BAD_REQUEST
+    return HONO_ERROR(
+      c,
+      "BAD_REQUEST",
+      "At least one field (name, slug, or image) must be provided for update",
     );
   }
 
@@ -180,13 +157,10 @@ export const PATCH_Handler: AuthenticatedRouteHandler<
       await deleteImageByIdOrSlug(
         updateData.categoryImgID,
         "id",
-        "after category update failure"
+        "after category update failure",
       );
     }
-    return c.json(
-      HONO_ERROR("INTERNAL_SERVER_ERROR", "Failed to update category"),
-      HTTP.INTERNAL_SERVER_ERROR
-    );
+    return HONO_ERROR(c, "INTERNAL_SERVER_ERROR", "Failed to update category");
   }
 
   // Clean up old image if it was replaced or removed
@@ -195,8 +169,5 @@ export const PATCH_Handler: AuthenticatedRouteHandler<
     // Don't fail the request, just log the error
   }
 
-  return c.json(
-    HONO_RESPONSE({ data: updatedCategory, statusCode: "OK" }),
-    HTTP.OK
-  );
+  return HONO_RESPONSE(c, { data: updatedCategory, statusCode: "OK" });
 };

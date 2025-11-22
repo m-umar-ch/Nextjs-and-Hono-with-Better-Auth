@@ -13,7 +13,7 @@ export default function NotFound() {
 
       <div className="mt-6">
         <Button asChild>
-          <Link href="/" prefetch={false}>
+          <Link href="/">
             <ArrowLeft />
             Back to Home
           </Link>

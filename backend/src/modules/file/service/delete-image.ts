@@ -84,16 +84,17 @@ export async function deleteImageByIdOrSlug(
     } as const;
   }
 
+  let fileId: string;
   let imageSlug: string;
 
   if (type === "id") {
     // It's a UUID - fetch the file record to get the slug
     const fileRecord = await db.query.file.findFirst({
       where: eq(file.id, identifier),
-      columns: { slug: true },
+      columns: { id: true, slug: true },
     });
 
-    if (!fileRecord?.slug) {
+    if (!fileRecord) {
       const errorMsg = `File with ID ${identifier} not found${
         context ? ` ${context}` : ""
       }`;
@@ -108,12 +109,48 @@ export async function deleteImageByIdOrSlug(
       } as const;
     }
 
+    fileId = fileRecord.id;
     imageSlug = fileRecord.slug;
   } else {
-    // It's a slug - use it directly
-    imageSlug = identifier;
+    // It's a slug - fetch the file record to get the ID
+    const fileRecord = await db.query.file.findFirst({
+      where: eq(file.slug, identifier),
+      columns: { id: true, slug: true },
+    });
+
+    if (!fileRecord) {
+      const errorMsg = `File with slug ${identifier} not found${
+        context ? ` ${context}` : ""
+      }`;
+      if (context) {
+        HONO_LOGGER.warn(errorMsg);
+      }
+      // Don't fail - just return success since file doesn't exist anyway
+      return {
+        data: { deleted: false },
+        error: null,
+        success: true,
+      } as const;
+    }
+
+    fileId = fileRecord.id;
+    imageSlug = fileRecord.slug;
   }
 
+  // Delete file entry from database first
+  const deleteResult = await db
+    .delete(file)
+    .where(eq(file.id, fileId))
+    .returning();
+
+  if (deleteResult.length === 0) {
+    if (context) {
+      HONO_LOGGER.warn(`File entry ${fileId} not found in database ${context}`);
+    }
+    // Continue to try filesystem deletion anyway
+  }
+
+  // Delete file from filesystem
   const result = await deleteImage(imageSlug);
 
   if (!result.success) {
@@ -124,13 +161,18 @@ export async function deleteImageByIdOrSlug(
         type,
       });
     }
-    // Don't fail - return success even if cleanup failed
+    // Don't fail - return success even if filesystem cleanup failed
+    // Database entry is already deleted
     return {
-      data: { deleted: false },
+      data: { deleted: deleteResult.length > 0 },
       error: null,
       success: true,
     } as const;
   }
 
-  return result;
+  return {
+    data: { deleted: true },
+    error: null,
+    success: true,
+  } as const;
 }

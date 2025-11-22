@@ -20,15 +20,16 @@ export {
   withTimeout,
 } from "./async-utils";
 // Re-export commonly used types for convenience
-export type { HTTPStatusKey, HTTPStatusValue } from "./response-utils";
 
 // HTTP response utilities
 export {
   type ErrorResponse,
   HONO_ERROR,
+  HONO_ERROR_WITHOUT_CONTEXT,
   HONO_PAGINATED_RESPONSE,
+  HONO_PAGINATED_RESPONSE_WITHOUT_CONTEXT,
   HONO_RESPONSE,
-  type SuccessResponse,
+  HONO_RESPONSE_WITHOUT_CONTEXT,
 } from "./response-utils";
 // String utilities
 export {
@@ -63,9 +64,12 @@ export {
  * - isConnectionError: Check if error is a connection/network error
  *
  * RESPONSE UTILITIES:
- * - HONO_ERROR: Create standardized error responses
- * - HONO_RESPONSE: Create standardized success responses
- * - HONO_PAGINATED_RESPONSE: Create paginated responses
+ * - HONO_ERROR: Create and return error responses directly (with Context)
+ * - HONO_ERROR_WITHOUT_CONTEXT: Create standardized error response objects (without Context)
+ * - HONO_RESPONSE: Create and return success responses directly (with Context)
+ * - HONO_RESPONSE_WITHOUT_CONTEXT: Create standardized success response objects (without Context)
+ * - HONO_PAGINATED_RESPONSE: Create and return paginated responses directly (with Context)
+ * - HONO_PAGINATED_RESPONSE_WITHOUT_CONTEXT: Create paginated response objects (without Context)
  * - isErrorResponse/isSuccessResponse: Response type guards
  * - HTTP_STATUS: HTTP status codes
  * - STATUS_PHRASES: HTTP status phrases

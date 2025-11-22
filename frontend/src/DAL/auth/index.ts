@@ -1,4 +1,4 @@
-import { authClient } from "@/auth/auth-client";
+import { authClient } from "@/auth/auth-client/server";
 import { tryCatch } from "@/lib/utils";
 import { headers } from "next/headers";
 
@@ -18,7 +18,7 @@ export async function getSession() {
   const sessionResult = await tryCatch(
     authClient.getSession({
       fetchOptions: { headers: await headers() },
-    })
+    }),
   );
 
   if (!sessionResult.success) return null;
@@ -40,10 +40,13 @@ export async function getUser() {
   const sessionResult = await tryCatch(
     authClient.getSession({
       fetchOptions: { headers: await headers() },
-    })
+    }),
   );
 
   if (!sessionResult.success) return null;
 
   return sessionResult.data?.data?.user || null;
 }
+
+export type UserOrNull = Awaited<ReturnType<typeof getUser>>;
+export type User = NonNullable<Awaited<ReturnType<typeof getUser>>>;

@@ -26,6 +26,12 @@
       "description": "Structured logging patterns with HONO_LOGGER and Sentry integration",
       "categories": ["logging", "monitoring", "debugging"],
       "priority": "medium"
+    },
+    "auth-patterns": {
+      "file": "./rules/auth-patterns.mdc",
+      "description": "Authentication and authorization patterns using requirePermissions middleware",
+      "categories": ["authentication", "authorization", "security", "middleware"],
+      "priority": "high"
     }
   },
   "categories": {
@@ -61,10 +67,22 @@
     },
     "debugging": {
       "description": "Debugging and troubleshooting guidelines"
+    },
+    "authentication": {
+      "description": "Authentication patterns and middleware usage"
+    },
+    "authorization": {
+      "description": "Permission-based authorization patterns"
+    },
+    "security": {
+      "description": "Security best practices and patterns"
+    },
+    "middleware": {
+      "description": "Middleware patterns and usage guidelines"
     }
   },
   "enforcement": {
-    "strict": ["naming-conventions", "response-patterns", "error-handling"],
+    "strict": ["naming-conventions", "response-patterns", "error-handling", "auth-patterns"],
     "recommended": ["logging-patterns"]
   },
   "tools": {
@@ -99,7 +117,7 @@
   },
   "metadata": {
     "created": "2025-01-01",
-    "lastUpdated": "2025-01-27",
+    "lastUpdated": "2025-01-28",
     "version": "1.0.0",
     "maintainer": "Development Team",
     "project-type": "Hono-based API starter with Better Auth, Drizzle ORM, and Sentry"

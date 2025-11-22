@@ -36,6 +36,10 @@ const EnvSchema = z.object({
     .string()
     .default("true")
     .transform((val) => val === "true"),
+
+  // Facebook Pixel
+  FACEBOOK_PIXEL_ID: z.string().nullable().optional(),
+  FACEBOOK_ACCESS_TOKEN: z.string().nullable().optional(),
 });
 
 export type env = z.infer<typeof EnvSchema>;

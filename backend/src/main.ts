@@ -25,7 +25,7 @@ import { auth } from "./modules/auth/service/auth";
 import { categoryController } from "./modules/category/controller/category.controller";
 import { fileController } from "./modules/file/controller/file.controller";
 import { mailerController } from "./modules/mailer/controller/mailer.controller";
-import { siteConfigController } from "./modules/siteConfig/controller/siteConfig.controller";
+import { userController } from "./modules/user/controller/user.controller";
 
 const createApp = () => {
   const app = createRouter().basePath("/api");
@@ -71,18 +71,18 @@ app.openapi(
   },
   (c) => {
     if (!c.var.session) {
-      return c.json(HONO_ERROR("UNAUTHORIZED"), HTTP.UNAUTHORIZED);
+      return HONO_ERROR(c, "UNAUTHORIZED");
     }
 
-    return c.json(HONO_RESPONSE({ message: "Yollo Bozo" }), HTTP.OK);
+    return HONO_RESPONSE(c, { message: "Yollo Bozo" });
   }
 );
 
 const controllers = [
+  userController,
   mailerController,
   categoryController,
   fileController,
-  siteConfigController,
 ] as const;
 
 for (const controller of controllers) {

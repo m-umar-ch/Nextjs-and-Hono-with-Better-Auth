@@ -4,8 +4,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  // reactCompiler: true,
-  // cacheComponents: true,
+  reactCompiler: true,
+  cacheComponents: true,
+  logging: { fetches: { fullUrl: true } },
+  typedRoutes: true,
 };
 
 export default withSentryConfig(nextConfig, {

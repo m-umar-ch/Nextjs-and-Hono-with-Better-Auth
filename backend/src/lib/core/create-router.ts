@@ -7,7 +7,7 @@ import {
 import type { Context, MiddlewareHandler, Schema } from "hono";
 import type { authClient } from "@/modules/auth/service/auth-client";
 import { UNPROCESSABLE_ENTITY } from "../http/status-codes";
-import { HONO_ERROR } from "../utils/response-utils";
+import { HONO_ERROR_WITHOUT_CONTEXT } from "../utils/response-utils";
 
 /**
  * Configuration options for creating a router instance
@@ -41,7 +41,7 @@ const createDefaultHook = (
               code: issue.code || undefined,
             }))
           : [{ message: "Validation failed" }];
-      const errorResponse = HONO_ERROR(
+      const errorResponse = HONO_ERROR_WITHOUT_CONTEXT(
         "UNPROCESSABLE_ENTITY",
         "Request validation failed",
         {

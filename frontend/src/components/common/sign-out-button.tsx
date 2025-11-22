@@ -1,5 +1,5 @@
 "use client";
-import { authClient } from "@/auth/auth-client";
+import { authClient } from "@/auth/auth-client/server";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
